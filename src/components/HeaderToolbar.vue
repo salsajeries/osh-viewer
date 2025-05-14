@@ -3,6 +3,14 @@
 
 <template>
   <v-toolbar title="OSH Viewer" color="blue">
+    <v-btn icon="mdi-home" to="/" />
+    <v-btn icon plain to="/nodemanager">
+      <v-icon>mdi-server</v-icon>
+      <v-tooltip activator="parent" location="bottom">
+        Node Manager
+      </v-tooltip>
+    </v-btn>
+    <v-btn icon="mdi-account" />
     <v-btn icon="mdi-menu" />
     <v-btn icon="mdi-magnify" />
   </v-toolbar>

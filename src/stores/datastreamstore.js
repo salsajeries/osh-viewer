@@ -16,5 +16,9 @@ export const useDataStreamStore = defineStore('datastreams', () => {
     return dataStreams.value.find(dataStream => dataStream.name === name)
   }
 
-  return { dataStreams, addDataStream, removeDataStream, getDataStreamByName }
+  const checkIfDataStreamExists = (id) => {
+    return dataStreams.value.some(dataStream => dataStream.id === id)
+  }
+
+  return { dataStreams, addDataStream, removeDataStream, getDataStreamByName, checkIfDataStreamExists }
 })

@@ -2,15 +2,23 @@
 import HeaderToolbar from '@/components/HeaderToolbar.vue'
 import MapView from '@/components/MapView.vue'
 import {OSHConnect, OSHNode} from '../services/osh-connect'
+import SystemBrowser from '@/components/oshconnect/SystemBrowser.vue'
+import DataStreamBrowser from '@/components/oshconnect/DataStreamBrowser.vue'
+import { useNodeStore } from '@/stores/nodestore.js'
 
 const connect = new OSHConnect()
 const node = connect.createNode('test', 'localhost', 8282, 'sensorhub/api/', 'admin', 'admin')
+const nodeStore = useNodeStore()
 
 const getSystems = () => {
   // This function will be called when the button is clicked
   console.log('Get Systems button clicked')
-  console.log('Node:', node)
-  node.getAllSystems()
+
+  nodeStore.nodes.forEach(node => {
+    console.log('Node:', node)
+    node.getAllSystems()
+  })
+  // node.getAllSystems()
 }
 
 const getDataStreams = () => {
@@ -24,8 +32,22 @@ const getDataStreams = () => {
   <v-card>
     <HeaderToolbar />
 <!--    <MapView></MapView>-->
-    <v-btn @click="getSystems">Get Systems</v-btn>
-    <v-btn @click="getDataStreams">Get DataStreams</v-btn>
+    <v-container>
+      <v-row no-gutters align="stretch">
+        <v-col cols="6">
+          <v-sheet class="pa-2 ma-2" elevation="2" width="100%">
+            <v-btn @click="getSystems">Get Systems</v-btn>
+            <SystemBrowser></SystemBrowser>
+          </v-sheet>
+        </v-col>
+        <v-col cols="6">
+          <v-sheet class="pa-2 ma-2" elevation="2" width="100%" rounded="20">
+            <v-btn @click="getDataStreams">Get DataStreams</v-btn>
+            <DataStreamBrowser></DataStreamBrowser>
+          </v-sheet>
+        </v-col>
+      </v-row>
+    </v-container>
   </v-card>
 </template>
 

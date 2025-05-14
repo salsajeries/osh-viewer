@@ -7,22 +7,35 @@ import { useSystemStore } from '@/stores/systemstore.js'
 import {useDataStreamStore} from '@/stores/datastreamstore.js'
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 
+let sharedStores = null;
+
+function getSharedStores() {
+  if (!sharedStores) {
+    sharedStores = {
+      nodeStore: useNodeStore(),
+      systemStore: useSystemStore(),
+      datastreamStore: useDataStreamStore()
+    }
+  }
+  return sharedStores;
+}
 
 export class OSHConnect {
 
   constructor() {
-    this.nodeStore = useNodeStore()
+    const stores = getSharedStores()
+    this.nodeStore = stores.nodeStore
   }
 
   createNode(name, host, port, endpoint, username, password) {
-    let newNode = new OSHNode(name, host, port, endpoint, username, password)
+    let newNode = new OSHNode(name, host, port, endpoint, username, password, this)
     this.nodeStore.addNode(newNode)
     return newNode
   }
 }
 
 export class OSHNode {
-  constructor(name, host, port, apiRoot, username, password) {
+  constructor(name, host, port, apiRoot, username, password, oshConnect) {
     this.name = name
     this.host = host
     this.port = port
@@ -30,6 +43,8 @@ export class OSHNode {
     this.password = password
     this.apiRoot = apiRoot
     this.systems = []
+    this.oshConnect = oshConnect
+    this.systemStore = getSharedStores().systemStore
   }
 
   async getAllSystems() {
@@ -44,11 +59,17 @@ export class OSHNode {
     }
 
     console.log('retrievedSystems', retrievedSystems)
-    this.systems = retrievedSystems.map(sys => {
-      return new CSSystem(sys)
+    retrievedSystems = retrievedSystems.map(sys => {
+      if (!this.systemStore.checkIfSystemExists(sys.properties.id)) {
+        let newSys = new CSSystem(sys, this)
+        this.systemStore.addSystem(newSys)
+        return newSys
+      }
     });
-    console.log("created systems", this.systems)
-    return this.systems;
+
+    this.systems = retrievedSystems;
+
+    return retrievedSystems;
   }
 
   async getAllDataStreams() {
@@ -61,17 +82,24 @@ export class OSHNode {
   getEndpointUrl() {
     return `${this.host}:${this.port}/${this.apiRoot}`
   }
+
+  getDSStore() {
+    return this.oshConnect.datastreamStore
+  }
 }
 
 
 export class CSSystem {
   // const systemStore = useSystemStore();
 
-  constructor(system) {
-    this. uuid = randomUUID();
+  constructor(system, parentNode) {
+    this.uuid = randomUUID()
+    this.id = system.properties.id
+    this.name = system.properties.properties.name
     this.system = system
-    this.systemStore = useSystemStore();
-    this.systemStore.addSystem(this);
+    this.parentNode = parentNode
+    const stores = getSharedStores()
+    this.datastreamStore = stores.datastreamStore
   }
 
   async getDataStreams() {
@@ -83,19 +111,29 @@ export class CSSystem {
       dataStreams.push(...items)
     }
 
+    console.log('dataStreams', dataStreams)
+
     this.dataStreams = dataStreams.map(ds => {
-      return new CSDataStream(ds)
+      if(!this.datastreamStore.checkIfDataStreamExists(ds.properties.id)) {
+        let newDS = new CSDataStream(ds)
+        this.datastreamStore.addDataStream(newDS)
+        return newDS
+      }
     })
 
     return this.dataStreams
   }
+
+  getDSStore() {
+    return this.parentNode.getDSStore();
+  }
 }
 
 export class CSDataStream {
-  constructor(dataStream) {
+  constructor(dataStream, parentSystem) {
     this.uuid = randomUUID();
     this.dataStream = dataStream
-    this.datastreamStore = useDataStreamStore();
-    this.datastreamStore.addDataStream(this);
+    this.name = dataStream.properties.name
+    this.parentSystem = parentSystem
   }
 }

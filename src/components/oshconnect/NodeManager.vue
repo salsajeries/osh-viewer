@@ -1,7 +1,7 @@
 <script setup>
 
 import { ref } from 'vue'
-import { OSHConnect } from '@/services/osh-connect.js'
+import { OSHConnect } from '@/services/osh-connect.ts'
 
 const oshconnect = new OSHConnect()
 

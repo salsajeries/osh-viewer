@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import { useSystemStore } from '@/stores/systemstore.js'
-import { useDataStreamStore } from '@/stores/datastreamstore.js'
-import { useNodeStore } from '@/stores/nodestore.js'
+import { useSystemStore } from '@/stores/systemstore.ts'
+import { useDataStreamStore } from '@/stores/datastreamstore.ts'
+import { useNodeStore } from '@/stores/nodestore.ts'
 
 const nodes = useNodeStore().nodes
 

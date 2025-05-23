@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { useSystemStore } from '@/stores/systemstore.js'
+import { useSystemStore } from '@/stores/systemstore.ts'
 
 const systems = useSystemStore().systems
 

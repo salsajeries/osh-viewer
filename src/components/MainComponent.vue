@@ -1,10 +1,10 @@
 <script setup>
 import HeaderToolbar from '@/components/HeaderToolbar.vue'
 import MapView from '@/components/MapView.vue'
-import {OSHConnect, OSHNode} from '../services/osh-connect'
+import {OSHConnect, OSHNode} from '../services/osh-connect.js'
 import SystemBrowser from '@/components/oshconnect/SystemBrowser.vue'
 import DataStreamBrowser from '@/components/oshconnect/DataStreamBrowser.vue'
-import { useNodeStore } from '@/stores/nodestore.js'
+import { useNodeStore } from '@/stores/nodestore.ts'
 
 const connect = new OSHConnect()
 const node = connect.createNode('test', 'localhost', 8282, 'sensorhub/api/', 'admin', 'admin')

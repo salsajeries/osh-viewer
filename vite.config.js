@@ -22,5 +22,12 @@ export default defineConfig({
     rollupOptions: {
       external: ['fsevents', 'node:path']
     }
+  },
+  ssr: {
+    noExternal: ['osh-js', 'cesium', 'leaflet']
+  },
+  optimizeDeps: {
+    include: ['osh-js', 'cesium', 'leaflet'],
+    exclude: ['Widgets/InfoBox/InfoBoxDescription.css']
   }
 })

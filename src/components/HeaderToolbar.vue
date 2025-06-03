@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <v-toolbar title="OSH Viewer" color="blue">
+  <v-toolbar title="OSH Viewer" color="blue" density="comfortable">
     <v-btn icon="mdi-home" to="/" />
     <v-btn icon plain to="/nodemanager">
       <v-icon>mdi-server</v-icon>

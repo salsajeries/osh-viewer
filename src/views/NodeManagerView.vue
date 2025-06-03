@@ -7,7 +7,6 @@ import HeaderToolbar from '@/components/HeaderToolbar.vue'
 
 <template>
   <v-card theme="dark">
-    <HeaderToolbar></HeaderToolbar>
     <v-container>
       <v-row no-gutters align="stretch">
         <v-col cols="12" md="4">

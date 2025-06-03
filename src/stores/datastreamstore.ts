@@ -19,8 +19,12 @@ export const useDataStreamStore = defineStore('datastreams', () => {
   }
 
   const checkIfDataStreamExists = (id: string): boolean => {
-    return dataStreams.value.some(dataStream => dataStream.id === id)
+    return dataStreams.value.some(dataStream => dataStream.uuid === id)
   }
 
-  return { dataStreams, addDataStream, removeDataStream, getDataStreamByName, checkIfDataStreamExists }
+  const getDataStreamsById = (ids: string[]): OSHDatastream[] => {
+    return dataStreams.value.filter(dataStream => ids.includes(dataStream.uuid))
+  }
+
+  return { dataStreams, addDataStream, removeDataStream, getDataStreamByName, checkIfDataStreamExists, getDataStreamsById }
 })

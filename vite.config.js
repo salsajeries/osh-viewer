@@ -20,14 +20,33 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: ['fsevents', 'node:path']
+      external: ['fsevents', 'node:path'],
+      plugins: [
+        {
+          name: 'treat-node-modules-workers',
+          resolveId(source) {
+            if (source.endsWith('.worker.js')) {
+              return { id: source, external: false };
+            }
+            return null;
+          }
+        }
+      ]
     }
   },
   ssr: {
     noExternal: ['osh-js', 'cesium', 'leaflet']
   },
   optimizeDeps: {
-    include: ['osh-js', 'cesium', 'leaflet'],
-    exclude: ['Widgets/InfoBox/InfoBoxDescription.css']
+    include: [ 'cesium', 'leaflet'],
+    exclude: ['Widgets/InfoBox/InfoBoxDescription.css', 'osh-js']
+  },
+  worker : {
+    format:  'es',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   }
 })

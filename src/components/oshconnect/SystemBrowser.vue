@@ -3,10 +3,16 @@ import { computed, ref } from 'vue'
 import { useSystemStore } from '@/stores/systemstore.ts'
 import { useNodeStore } from '@/stores/nodestore.js'
 import { useOSHConnectStore } from '@/stores/oshconnectstore.js'
+import { useDataStreamStore } from '@/stores/datastreamstore.js'
+import { useUIStore } from '@/stores/uistore.ts'
 
 const oshConnect = useOSHConnectStore().getInstance();
 const nodeStore = useNodeStore()
 const systems = useSystemStore().systems
+const datastreamStore = useDataStreamStore()
+const uiStore = useUIStore()
+const activeTab = ref('systems') // Default active tab
+const tabLabels = ref(['Systems', 'DataStreams', 'Nodes'])
 
 const getSystems = () => {
   // This function will be called when the button is clicked
@@ -32,6 +38,12 @@ const fetchResources = () => {
   oshConnect.fetchSlowResources();
 }
 
+const addVisualization = (item) => {
+  console.log('Item properties:', Object.keys(item));
+  console.log('Add Visualization button clicked for item:', item);
+  uiStore.setSelectedDatastream(item)
+}
+
 const getItemChildren = computed(() => {
   return (item) => {
     return item?.getDSChildren ? item.getDSChildren() : []
@@ -40,19 +52,79 @@ const getItemChildren = computed(() => {
 
 </script>
 <template>
+  <v-tabs
+    v-model="activeTab">
+    <v-tab
+      v-for="(label, index) in tabLabels"
+      :key="index"
+      :value="label.toLowerCase()">
+      {{ label }}
+
+    </v-tab>
+  </v-tabs>
   <v-btn @click="fetchResources">Fetch Resources</v-btn>
   <v-btn @click="getSystems">Get Systems</v-btn>
   <v-btn @click="getAllDatastreams">Get DataStreams</v-btn>
-  <v-treeview
-    width="100%"
-    :items="systems"
-    item-value="uuid"
-    item-title="name"
-    :item-children="getItemChildren"
-    color="primary"
-    theme="dark"
-    activatable>
-  </v-treeview>
+
+  <v-tabs-window v-model="activeTab">
+    <v-tabs-window-item value="systems">
+      <v-treeview
+        width="100%"
+        :items="systems"
+        item-value="uuid"
+        item-title="name"
+        :item-children="getItemChildren"
+        color="primary"
+        theme="dark"
+        activatable>
+        <template v-slot:prepend>
+          <v-icon icon="mdi-cogs"></v-icon>
+        </template>
+      </v-treeview>
+    </v-tabs-window-item>
+
+    <v-tabs-window-item value="datastreams">
+      <v-treeview
+        width="100%"
+        :items="datastreamStore.dataStreams"
+        item-value="uuid"
+        item-title="name"
+        color="primary"
+        theme="dark"
+        activatable>
+        <template v-slot:prepend>
+          <v-icon icon="mdi-cable-data"></v-icon>
+        </template>
+        <template v-slot:append="{ item }">
+          <v-tooltip text="Add Visualization" location="bottom">
+            <template #activator="{ props }">
+              <v-btn v-bind="props" icon="mdi-eye-plus" size="small" @click="() => addVisualization(item)"></v-btn>
+            </template>
+          </v-tooltip>
+          <v-tooltip text="Properties" location="bottom">
+            <template #activator="{ props }">
+              <v-btn v-bind="props" icon="mdi-list-box-outline" size="small"></v-btn>
+            </template>
+          </v-tooltip>
+        </template>
+      </v-treeview>
+    </v-tabs-window-item>
+
+    <v-tabs-window-item value="nodes">
+      <v-treeview
+        width="100%"
+        :items="nodeStore.nodes"
+        item-value="uuid"
+        item-title="name"
+        color="primary"
+        theme="dark"
+        activatable>
+        <template v-slot:prepend>
+          <v-icon icon="mdi-server"></v-icon>
+        </template>
+      </v-treeview>
+    </v-tabs-window-item>
+  </v-tabs-window>
 </template>
 
 <style scoped>

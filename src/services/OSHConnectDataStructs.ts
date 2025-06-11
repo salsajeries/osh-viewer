@@ -3,6 +3,7 @@ import { randomUUID }  from 'osh-js/source/core/utils/Utils.js'
 import Systems from 'osh-js/source/core/consysapi/system/Systems.js'
 import SystemFilter from 'osh-js/source/core/consysapi/system/SystemFilter.js'
 import System from 'osh-js/source/core/consysapi/system/System.js'
+import DataSynchronizer from 'osh-js/source/core/timesync/DataSynchronizer.js'
 import { useNodeStore } from '@/stores/nodestore'
 import { useSystemStore } from '@/stores/systemstore'
 import { useDataStreamStore } from '@/stores/datastreamstore'
@@ -207,6 +208,10 @@ export class OSHDatastream {
     this.parentId = parentId
     this.datastream = datastream;
     this.id = datastream.properties.id;
+  }
+
+  registerWithSynchronizer(synchronizer: DataSynchronizer): void {
+    synchronizer.addDataSource(this.datastream);
   }
 }
 

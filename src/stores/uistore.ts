@@ -15,6 +15,9 @@ export const useUIStore = defineStore('ui', () => {
   // Main window ID to determine center visualization
   const mainWindowId = ref<string | null>(null)
 
+  // Currently selected datastream (null or object/ID)
+  const selectedDatastream = ref<any | null>(null)
+
   // Example actions
   function toggleLeftSidebar() {
     leftSidebarOpen.value = !leftSidebarOpen.value
@@ -31,6 +34,9 @@ export const useUIStore = defineStore('ui', () => {
   function setMainWindowId(id: string | null) {
     mainWindowId.value = id
   }
+  function setSelectedDatastream(ds: any | null) {
+    selectedDatastream.value = ds
+  }
 
   return {
     leftSidebarOpen,
@@ -38,10 +44,12 @@ export const useUIStore = defineStore('ui', () => {
     focusedMap,
     activeWindows,
     mainWindowId,
+    selectedDatastream,
     toggleLeftSidebar,
     toggleRightSidebar,
     setFocusedMap,
     setActiveWindows,
-    setMainWindowId
+    setMainWindowId,
+    setSelectedDatastream
   }
 })

@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineProps } from 'vue'
 // @ts-ignore
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 // @ts-ignore
-import { SweApi }  from 'osh-js/core/datasource/sweapi/SweApi.datasource.js'
-import SweApiDatasource from "osh-js/core/datasource/sweapi/SweApi.datasource";
+import SweApi  from 'osh-js/source/core/datasource/sweapi/SweApi.datasource.js'
+// import SweApiDatasource from "osh-js/core/datasource/sweapi/SweApi.datasource";
 // import DataSynchronizer from 'osh-js/core/timesync/DataSynchronizer';
 // @ts-ignore
-import { Mode } from 'osh-js/core/datasource/Mode'
+import { Mode } from 'osh-js/source/core/datasource/Mode'
 // @ts-ignore
-import ChartJsView from 'osh-js/core/ui/view/chart/ChartJsView.js'
+import ChartJsView from 'osh-js/source/core/ui/view/chart/ChartJsView.js'
 // @ts-ignore
-import CurveLayer from 'osh-js/core/ui/layer/CurveLayer.js'
+import CurveLayer from 'osh-js/source/core/ui/layer/CurveLayer.js'
+import DataSynchronizer from 'osh-js/source/core/timesync/DataSynchronizer.js'
+
+import ConSysApi from 'osh-js/source/core/datasource/consysapi/ConSysApi.datasource'
 
 // Generate a random ID when the component is created
 const chartId = ref('chart-' + randomUUID())
@@ -19,8 +22,21 @@ const chartDatasource = ref<any>(null)
 let chartLayer: any = null
 let chartView: any = null
 
+const props = defineProps({
+  datastream: {
+    type: Object,
+    required: false,
+    default: null
+  }
+})
+
 function setChartDatasource() {
-  const ds = new SweApiDatasource('test-chart', {
+  if (props.datastream) {
+    // this should be a valid the CS API Datastream
+    chartDatasource.value = props.datastream.datastream
+    return
+  }
+  const ds = new SweApi('test-chart', {
     endpointUrl: 'localhost:8282/sensorhub/api',
     resource: '/datastreams/efd58gkad5hfq/observations',
     tls: false,
@@ -34,10 +50,22 @@ function setChartDatasource() {
 
 onMounted(() => {
   setChartDatasource()
+  const ds = chartDatasource.value;
+  const dsConverted = new ConSysApi(ds.properties.name, {
+    endpointUrl: ds.networkProperties.endpointUrl,
+    resource: `/datastreams/${ds.properties.id}/observations`,
+    tls: false,
+    protocol: 'ws',
+    startTime: 'now',
+    endTime: '2025-08-01T00:00:00Z',
+    mode: Mode.REAL_TIME,
+    responseFormat: 'application/swe+json'
+  })
 
   chartLayer = new CurveLayer({
     maxValues: 1000,
-    dataSourceId: chartDatasource.value,
+    // dataSourceId: chartDatasource.value.properties.id,
+    dataSourceId: dsConverted.id,
     getValues: (rec: any, timestamp: any) => {
       console.log(`getValues called for record: ${rec}`)
       return {
@@ -63,7 +91,18 @@ onMounted(() => {
   })
 
   if (chartDatasource.value && typeof chartDatasource.value.connect === 'function') {
-    chartDatasource.value.connect()
+    console.log(`Connecting to datasource: ${chartDatasource.value}`)
+    // chartDatasource.value.streamObservations(undefined, (data: any) => {
+    //   console.log('Received data:', data)
+    // });
+
+    dsConverted.connect();
+
+    // const dataSynchronizer = new DataSynchronizer({
+    //   replaySpeed: 1,
+    //   dataSources: [chartDatasource.value]
+    // })
+    // dataSynchronizer.connect();
   }
 })
 </script>
@@ -77,4 +116,3 @@ onMounted(() => {
 <style scoped>
 
 </style>
-

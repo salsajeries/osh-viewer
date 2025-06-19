@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { OSHSystem } from '@/services/OSHConnectDataStructs'
+import { OSHSystem } from '@/lib/OSHConnectDataStructs'
 
 export const useSystemStore = defineStore('systems', () => {
   const systems = ref<OSHSystem[]>([])

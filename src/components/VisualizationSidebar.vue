@@ -4,60 +4,84 @@ import { ref } from 'vue'
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 import Chart from '@/components/visualizations/Chart.vue'
 import { useUIStore } from '@/stores/uistore.ts'
+import { checkDSForProp, mineDatasourceObsProps, VisualizationMetadata } from '@/lib/DatasourceUtils'
+import Video from '@/components/visualizations/Video.vue'
 
 // Each visualization can be represented by an object with a unique id
-const visualizations = ref<{ id: string }[]>([])
-const uiStore = useUIStore()
+const visualizations = ref<VisualizationMetadata[]>([])
+// const uiStore = useUIStore()
 
 const chartDS = ref<any>(null)
 
-function addVisualization() {
+/*function addVisualization() {
   visualizations.value.push({
     id: 'viz-' + randomUUID()
   })
-}
+}*/
 
 function addChart() {
-  // Logic to add a chart visualization
-  const ds = uiStore.selectedDatastream;
-  if (!ds) {
-    console.warn('No datastream selected');
-    return;
-  }
-  console.log('Adding chart for datastream:', ds);
-  // Check for air temperature in observedProperties
-  const observedProps = ds.datastream.properties?.observedProperties || [];
-  console.log('Observed Properties:', observedProps);
 
-  // TODO: make this a method of OSHDatastream...
-  for (const prop of observedProps) {
-    if (prop.definition.includes("air_temperature")) {
-      console.log('Air temperature property found:', prop);
-      chartDS.value = ds;
-      // Add a chart for this property
-      visualizations.value.push({
-        id: 'chart-' + randomUUID(),
-        type: 'chart',
-        datastreamId: ds.id,
-        observedProperty: prop
-      });
-      return;
-    }
+  const { ds, observedProps } = mineDatasourceObsProps()
+
+  /* for (const prop of observedProps) {
+     if (prop.definition.includes("air_temperature")) {
+       console.log('Air temperature property found:', prop);
+       chartDS.value = ds;
+       // Add a chart for this property
+       visualizations.value.push({
+         id: 'chart-' + randomUUID(),
+         type: 'chart',
+         datastreamId: ds.id,
+         observedProperty: prop
+       });
+       return;
+     }
+   }*/
+  const prop = checkDSForProp('air_temperature', observedProps)
+  if (prop) {
+    console.log('Air temperature property found:', prop)
+    chartDS.value = ds
+    // Add a chart for this property
+    visualizations.value.push({
+      id: 'chart-' + randomUUID(),
+      type: 'chart',
+      datastreamId: ds.id,
+      observedProperty: prop
+    })
+    return
+  }
+}
+
+function addVideo() {
+  const { ds, observedProps } = mineDatasourceObsProps()
+  const prop = checkDSForProp('RasterImage', observedProps)
+
+  if (prop) {
+    chartDS.value = ds
+
+    visualizations.value.push({
+      id: 'video-' + randomUUID(),
+      type: 'video',
+      datastreamId: ds.id,
+      observedProperty: prop
+    })
   }
 }
 </script>
 
 <template>
   <v-sheet id="viz-sidebar">
-    <button @click="addVisualization">Add Visualization</button>
+    <!--    <button @click="addVisualization">Add Visualization</button>-->
     <v-btn @click="addChart">Add Chart</v-btn>
+    <v-btn @click="addVideo">Add Video</v-btn>
     <div class="visualization-list">
       <div
         v-for="viz in visualizations"
         :key="viz.id"
         class="visualization-item"
       >
-        <Chart :datastream="chartDS"></Chart>
+        <Chart :datastream="chartDS" v-if="viz.type==='chart'"></Chart>
+        <Video :datastream="chartDS" v-if="viz.type === 'video'"></Video>
       </div>
     </div>
   </v-sheet>

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
 import { ref, Ref } from 'vue'
-import { OSHDatastream } from '@/services/OSHConnectDataStructs'
+import { OSHDatastream } from '@/lib/OSHConnectDataStructs'
 
 export const useDataStreamStore = defineStore('datastreams', () => {
   const dataStreams: Ref<OSHDatastream[]> = ref([])

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { OSHConnect } from '@/services/OSHConnectDataStructs'
+import { OSHConnect } from '@/lib/OSHConnectDataStructs'
 
 export const useOSHConnectStore = defineStore('oshconnect', {
   state: () => ({

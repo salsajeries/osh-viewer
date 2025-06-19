@@ -3,6 +3,8 @@ import { ref, onMounted, defineProps } from 'vue'
 // @ts-ignore
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 // @ts-ignore
+import { createDefaultDataSource } from './DataComposables'
+// @ts-ignore
 import SweApi  from 'osh-js/source/core/datasource/sweapi/SweApi.datasource.js'
 // import SweApiDatasource from "osh-js/core/datasource/sweapi/SweApi.datasource";
 // import DataSynchronizer from 'osh-js/core/timesync/DataSynchronizer';

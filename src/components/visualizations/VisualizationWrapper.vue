@@ -10,6 +10,7 @@ const props = defineProps({
 // Map visualization types to components
 const visualizationMap: Record<string, any> = {
   chart: () => import('./Chart.vue'),
+  video: () => import('./Video.vue'),
   // Add more visualization types here as needed
 };
 

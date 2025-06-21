@@ -5,11 +5,16 @@ import { useNodeStore } from '@/stores/nodestore.js'
 import { useOSHConnectStore } from '@/stores/oshconnectstore.js'
 import { useDataStreamStore } from '@/stores/datastreamstore.js'
 import { useUIStore } from '@/stores/uistore.ts'
+import { useVisualizationStore } from '@/stores/visualizationstore.js'
+import { checkDSForProp, mineDatasourceObsProps } from '@/lib/DatasourceUtils.js'
+import { OSHVisualization } from '@/lib/OSHConnectDataStructs.js'
+import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 
 const oshConnect = useOSHConnectStore().getInstance();
 const nodeStore = useNodeStore()
 const systems = useSystemStore().systems
 const datastreamStore = useDataStreamStore()
+const visualizationStore = useVisualizationStore()
 const uiStore = useUIStore()
 const activeTab = ref('systems') // Default active tab
 const tabLabels = ref(['Systems', 'DataStreams', 'Nodes'])
@@ -42,6 +47,20 @@ const addVisualization = (item) => {
   console.log('Item properties:', Object.keys(item));
   console.log('Add Visualization button clicked for item:', item);
   uiStore.setSelectedDatastream(item)
+  const { ds, observedProps } = mineDatasourceObsProps()
+
+  console.log('Observed Props:', observedProps)
+  if (checkDSForProp('SensorLocation', observedProps)) {
+    console.log('Location property found, adding visualization')
+    const newMapViz = new OSHVisualization('pointmarker-' + randomUUID(),
+      item.name,
+      'pointmarker',
+      null,
+      ds
+    )
+
+    visualizationStore.addVisualization(newMapViz);
+  }
 }
 
 const getItemChildren = computed(() => {

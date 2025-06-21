@@ -71,3 +71,17 @@ export function createVideoDataSource(datastream: OSHDatastream) {
   return datasource
 }
 
+export function createLocationDataSource(datastream: OSHDatastream) {
+  const datasource = new ConSysApi(datastream.name, {
+    protocol: 'ws',
+    endpointUrl: datastream.datastream.networkProperties.endpointUrl,
+    resource: `/datastreams/${datastream.datastream.properties.id}/observations`,
+    tls: false,
+    startTime: '2025-01-01T00:00:00Z',
+    endTime: '2025-08-01T00:00:00Z',
+    mode: Mode.BATCH,
+    responseFormat: 'application/swe+json'
+  })
+
+  return datasource
+}

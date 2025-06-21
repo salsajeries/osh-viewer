@@ -229,18 +229,18 @@ export class OSHControlStream {
   }
 }
 
-class OSHVisualization {
+export class OSHVisualization {
   id: string
   name: string
   type: string
   parentId: string | null
-  data: any
+  parentDatastream: OSHDatastream
 
-  constructor(id: string, name: string, type: string, parentId: string | null, data: any) {
-    this.id = id
-    this.name = name
-    this.type = type
-    this.parentId = parentId
-    this.data = data
+  constructor(id: string, name: string, type: string, parentId: string | null, parentDatastream: OSHDatastream) {
+    this.id = id;
+    this.name = name;
+    this.type = type;
+    this.parentId = parentId;
+    this.parentDatastream = parentDatastream;
   }
 }

@@ -4,7 +4,10 @@ import CesiumView from 'osh-js/source/core/ui/view/map/CesiumView'
 import { CesiumTerrainProvider, EllipsoidTerrainProvider, Ion, IonResource } from 'cesium'
 import * as Cesium from 'cesium'
 import LeafletView from 'osh-js/source/core/ui/view/map/LeafletView'
-import { onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useVisualizationStore } from '../stores/visualizationstore'
+import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
+import { createLocationDataSource } from '@/components/visualizations/DataComposables'
 
 
 let pointMarker = new PointMarkerLayer({
@@ -14,8 +17,6 @@ let pointMarker = new PointMarkerLayer({
     z: 0
   }
 })
-
-let leafletMapView
 
 /*Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ZWYzYjhiMy0wMzcwLTQxMTktOGY1OS0wYzM1NzNlOTI3NDMiLCJpZCI6Mzk4MzMsImlhdCI6MTc0ODIwNDA4OX0.HBox4N50pESMU1yJs33-0cNd22sTvIv0KetnMAJMdXU'
 
@@ -39,12 +40,50 @@ cesiumView.viewer.terrainProvider = Cesium.CesiumTerrainProvider.fromIonAssetId(
       requestWaterMask: true
     })*/
 onMounted(() => {
-  leafletMapView = new LeafletView({
+  const leafletMapView = new LeafletView({
     container: 'cesiumContainer',
     layers: [pointMarker],
     autoZoomOnFirstMarker: true
   })
+
+  const visualizationStore = useVisualizationStore()
+// const mapVisualizations = ref(visualizationStore.getVisualizationsByType('pointmarker'))
+  const currentVisualizations = ref<OSHVisualization[]>([])
+  const pmLayers = ref([])
+
+  const mapVisualizations = computed(() => {
+    return visualizationStore.getVisualizationsByType('pointmarker')
+  })
+
+  watch(mapVisualizations, (updated) => {
+    // do stuff with new items in list
+    const remFiltered = currentVisualizations.value.filter(val => !updated.includes(val))
+    const newFiltered = updated.filter(val => !currentVisualizations.value.includes(val))
+    console.log('New visualizations:', newFiltered)
+    currentVisualizations.value.push(...newFiltered)
+
+    for (const viz of newFiltered) {
+      const datasource = createLocationDataSource(viz.parentDatastream)
+
+      const pmLayer = new PointMarkerLayer({
+        name: viz.name,
+        dataSourceIds: [datasource.id],
+        getLocation: (rec: any) => {
+          console.log(`getLocation called for record: ${rec}`)
+          return {
+            x: rec.location.lon,
+            y: rec.location.lat,
+            z: rec.location.alt
+          }
+        }
+      })
+      pmLayers.value.push(pmLayer)
+      leafletMapView.addLayer(pmLayer)
+      datasource.connect()
+    }
+  }, { deep: true })
 })
+
 
 </script>
 

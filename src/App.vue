@@ -22,7 +22,6 @@ const { theme } = storeToRefs(uistore)
 
 <style scoped>
 .background {
-  background-color: var(--color-background);
   height: 100vh;
   width: 100vw;
   display: flex;

@@ -21,6 +21,9 @@ export const useUIStore = defineStore('ui', () => {
 
   const selectedProperty = ref<SchemaFieldProperty | null>(null)
 
+  // Theme state
+  const theme = ref<'dark' | 'light'>('dark')
+
   // Example actions
   function toggleLeftSidebar() {
     leftSidebarOpen.value = !leftSidebarOpen.value
@@ -46,6 +49,9 @@ export const useUIStore = defineStore('ui', () => {
   function clearSelectedProperty() {
     selectedProperty.value = null
   }
+  function toggleTheme() {
+    theme.value = theme.value === 'dark' ? 'light' : 'dark'
+  }
 
   return {
     leftSidebarOpen,
@@ -62,5 +68,7 @@ export const useUIStore = defineStore('ui', () => {
     setSelectedDatastream,
     selectedProperty,
     setSelectedProperty,
+    theme,
+    toggleTheme,
   }
 })

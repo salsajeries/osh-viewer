@@ -13,7 +13,6 @@ const datastreams = useDataStreamStore().dataStreams
     item-value="uuid"
     item-title="name"
     color="primary"
-    theme="dark"
     activatable>
   </v-treeview>
 </template>

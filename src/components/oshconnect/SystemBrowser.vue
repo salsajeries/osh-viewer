@@ -104,7 +104,6 @@ const getItemChildren = computed(() => {
         item-title="name"
         :item-children="getItemChildren"
         color="primary"
-        theme="dark"
         activatable>
         <template v-slot:prepend>
           <v-icon icon="mdi-cogs"></v-icon>
@@ -119,7 +118,6 @@ const getItemChildren = computed(() => {
         item-value="uuid"
         item-title="name"
         color="primary"
-        theme="dark"
         activatable>
         <template v-slot:prepend>
           <v-icon icon="mdi-cable-data"></v-icon>
@@ -146,7 +144,6 @@ const getItemChildren = computed(() => {
         item-value="uuid"
         item-title="name"
         color="primary"
-        theme="dark"
         activatable>
         <template v-slot:prepend>
           <v-icon icon="mdi-server"></v-icon>

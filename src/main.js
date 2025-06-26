@@ -22,7 +22,10 @@ const vuetify = createVuetify({
   directives,
   icons: {
     defaultSet: 'mdi'
-  }
+  },
+  theme: {
+    defaultTheme: 'dark',
+  },
 })
 
 const pinia = createPinia()

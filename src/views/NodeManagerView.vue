@@ -6,7 +6,7 @@ import HeaderToolbar from '@/components/HeaderToolbar.vue'
 </script>
 
 <template>
-  <v-card theme="dark">
+  <v-card>
     <v-container>
       <v-row no-gutters align="stretch">
         <v-col cols="12" md="4">
@@ -23,14 +23,5 @@ import HeaderToolbar from '@/components/HeaderToolbar.vue'
 </template>
 
 <style scoped>
-div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
-  height: 100vh;
-  width: 100vw;
-  background-color: var(--color-background);
-}
 
 </style>

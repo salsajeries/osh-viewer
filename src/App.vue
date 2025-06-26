@@ -1,17 +1,23 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import HeaderToolbar from '@/components/HeaderToolbar.vue'
+import { storeToRefs } from 'pinia'
+import { useUIStore } from '@/stores/uistore'
 
+const uistore = useUIStore()
+const { theme } = storeToRefs(uistore)
 
 </script>
 
 <template>
-  <v-sheet class="background">
-    <HeaderToolbar />
-    <div class="router-content">
-      <RouterView />
-    </div>
-  </v-sheet>
+  <VApp>
+    <v-sheet class="background" :theme="theme">
+      <HeaderToolbar />
+      <div class="router-content">
+        <RouterView />
+      </div>
+    </v-sheet>
+  </VApp>
 </template>
 
 <style scoped>

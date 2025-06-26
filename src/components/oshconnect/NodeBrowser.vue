@@ -1,7 +1,4 @@
 <script setup>
-import { ref } from 'vue'
-import { useSystemStore } from '@/stores/systemstore.ts'
-import { useDataStreamStore } from '@/stores/datastreamstore.ts'
 import { useNodeStore } from '@/stores/nodestore.ts'
 
 const nodes = useNodeStore().nodes
@@ -14,7 +11,6 @@ const nodes = useNodeStore().nodes
     item-value="uuid"
     item-title="name"
     color="primary"
-    theme="dark"
     activatable>
   </v-treeview>
 </template>

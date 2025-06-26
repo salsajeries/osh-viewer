@@ -31,11 +31,10 @@ const props = defineProps({
 })
 
 const videoDivId = ref('video-' + randomUUID());
+const videoCanvas = ref<HTMLCanvasElement | null>(null);
 // const datasource = createDefaultDataSource(props.datastream)
 
 onMounted(() => {
-  // This is where you would set up your video component
-  // For example, you might want to initialize a video player or load a video source
   console.log('Video component mounted with OSHVisualization:', props.visualization);
 
   const datasource = createVideoDataSource(props.visualization.parentDatastream);
@@ -48,15 +47,27 @@ onMounted(() => {
 
   const videoView = new VideoView({
     container: videoDivId.value,
-    // css: "video-h264",
+    css: "video-h264",
     // name: props.videoTitle,
     showTime: true,
     showStats: true,
     useWebCodecApi: true,
+    width: 480,
+    height: 360,
     layers: [videolayer]
   });
+  // NOTE: The width and height parameters are disregarded in the standard OSH-JS.
+  // If yours is not working, you may have to modify the source code of the VideoView class.
+  // And you may need to modify WebCodecView, FFMPEGView, etc.
 
   datasource.connect();
+
+  // to find video canvas
+  let canvases = document.getElementById(videoDivId.value)?.getElementsByTagName("canvas")
+  videoCanvas.value = canvases[0] as HTMLCanvasElement;
+  console.log('[VideoVue] Video canvas element:', videoCanvas.value);
+  videoCanvas.value.classList.add("test-canvas-class");
+  videoCanvas.value.style.width = "480px";
 });
 
 </script>
@@ -70,5 +81,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
+.video-h264 {
+  width: 100%;
+  height: 100%;
+}
 </style>

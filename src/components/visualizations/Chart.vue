@@ -15,8 +15,12 @@ import ChartJsView from 'osh-js/source/core/ui/view/chart/ChartJsView.js'
 // @ts-ignore
 import CurveLayer from 'osh-js/source/core/ui/layer/CurveLayer.js'
 import DataSynchronizer from 'osh-js/source/core/timesync/DataSynchronizer.js'
+import DataStreamFilter from 'osh-js/source/core/sweapi/datastream/DataStreamFilter.js'
 
 import ConSysApi from 'osh-js/source/core/datasource/consysapi/ConSysApi.datasource'
+import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
+import { fetchSchema, matchPropAndSchema, SchemaFieldProperty } from '@/lib/DatasourceUtils'
+import { useUIStore } from '@/stores/uistore'
 
 // Generate a random ID when the component is created
 const chartId = ref('chart-' + randomUUID())
@@ -25,61 +29,62 @@ let chartLayer: any = null
 let chartView: any = null
 
 const props = defineProps({
-  datastream: {
-    type: Object,
+  visualization: {
+    type: OSHVisualization,
     required: false,
     default: null
   }
 })
 
 function setChartDatasource() {
-  if (props.datastream) {
+
+  if (props.visualization) {
+    console.log('[ChartVue] Visualization provided:', props.visualization)
     // this should be a valid the CS API Datastream
-    chartDatasource.value = props.datastream.datastream
+    chartDatasource.value = props.visualization.parentDatastream;
     return
   }
-  const ds = new SweApi('test-chart', {
-    endpointUrl: 'localhost:8282/sensorhub/api',
-    resource: '/datastreams/efd58gkad5hfq/observations',
-    tls: false,
-    startTime: 'now',
-    endTime: '2025-08-01T00:00:00Z',
-    mode: Mode.REAL_TIME,
-    responseFormat: 'application/swe+json'
-  })
-  chartDatasource.value = ds
 }
 
-onMounted(() => {
+
+onMounted(async () => {
+
   setChartDatasource()
   const ds = chartDatasource.value;
-  const dsConverted = new ConSysApi(ds.properties.name, {
-    endpointUrl: ds.networkProperties.endpointUrl,
-    resource: `/datastreams/${ds.properties.id}/observations`,
+  console.log('[ChartVue] Chart datasource:', ds)
+
+  const dsConverted = new SweApi(ds.name, {
+    endpointUrl: ds.datastream.networkProperties.endpointUrl,
+    resource: `/datastreams/${ds.datastream.properties.id}/observations`,
     tls: false,
     protocol: 'ws',
     startTime: 'now',
     endTime: '2025-08-01T00:00:00Z',
     mode: Mode.REAL_TIME,
     responseFormat: 'application/swe+json'
-  })
+  });
+
+  console.log('[ChartVue] Converted datasource:', dsConverted)
+
+  // to fetch the schema and determine the property name
+  const selectedProperty = useUIStore().selectedProperty;
 
   chartLayer = new CurveLayer({
     maxValues: 1000,
     // dataSourceId: chartDatasource.value.properties.id,
     dataSourceId: dsConverted.id,
     getValues: (rec: any, timestamp: any) => {
-      console.log(`getValues called for record: ${rec}`)
+      console.log(`getValues called for record:`, rec)
       return {
         x: rec.timestamp,
-        y: rec.temperature
+        y: rec[selectedProperty.name]
       }
     },
     lineColor: 'rgba(0,220,204,0.5)',
     backgroundColor: 'rgba(49,47,47,0.64)',
     fill: true,
     getCurveId: (rec: any, timestamp: any) => 2,
-    name: 'Temperature (°)'
+    name: `${selectedProperty.label} (${selectedProperty.uom.code})`,
   })
 
   chartView = new ChartJsView({
@@ -91,6 +96,8 @@ onMounted(() => {
     },
     refreshRate: 1000
   })
+
+  dsConverted.connect();
 
   if (chartDatasource.value && typeof chartDatasource.value.connect === 'function') {
     console.log(`Connecting to datasource: ${chartDatasource.value}`)
@@ -111,7 +118,7 @@ onMounted(() => {
 
 <template>
   <div :id="chartId">
-    <p>I'm a Chart</p>
+    <p>{{visualization.name}}</p>
   </div>
 </template>
 

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, Ref } from 'vue'
+import { SchemaFieldProperty } from '@/lib/DatasourceUtils'
 
 export const useUIStore = defineStore('ui', () => {
   // Sidebar state (example: left and right sidebars)
@@ -17,6 +18,8 @@ export const useUIStore = defineStore('ui', () => {
 
   // Currently selected datastream (null or object/ID)
   const selectedDatastream = ref<any | null>(null)
+
+  const selectedProperty = ref<SchemaFieldProperty | null>(null)
 
   // Example actions
   function toggleLeftSidebar() {
@@ -37,6 +40,12 @@ export const useUIStore = defineStore('ui', () => {
   function setSelectedDatastream(ds: any | null) {
     selectedDatastream.value = ds
   }
+  function setSelectedProperty(prop: SchemaFieldProperty | null) {
+    selectedProperty.value = prop
+  }
+  function clearSelectedProperty() {
+    selectedProperty.value = null
+  }
 
   return {
     leftSidebarOpen,
@@ -50,6 +59,8 @@ export const useUIStore = defineStore('ui', () => {
     setFocusedMap,
     setActiveWindows,
     setMainWindowId,
-    setSelectedDatastream
+    setSelectedDatastream,
+    selectedProperty,
+    setSelectedProperty,
   }
 })

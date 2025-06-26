@@ -5,11 +5,11 @@ import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 import VideoDataLayer from 'osh-js/source/core/ui/layer/VideoDataLayer.js'
 import VideoView from 'osh-js/source/core/ui/view/video/VideoView.js'
 import { createDefaultDataSource, createVideoDataSource } from '@/components/visualizations/DataComposables'
-import { OSHDatastream } from '@/lib/OSHConnectDataStructs'
+import { OSHDatastream, OSHVisualization } from '@/lib/OSHConnectDataStructs'
 
 const props = defineProps({
-  datastream: {
-    type: OSHDatastream,
+  visualization: {
+    type: OSHVisualization,
     required: true,
     default: null
   },
@@ -36,9 +36,9 @@ const videoDivId = ref('video-' + randomUUID());
 onMounted(() => {
   // This is where you would set up your video component
   // For example, you might want to initialize a video player or load a video source
-  console.log('Video component mounted with datastream:', props.datastream);
+  console.log('Video component mounted with OSHVisualization:', props.visualization);
 
-  const datasource = createVideoDataSource(props.datastream);
+  const datasource = createVideoDataSource(props.visualization.parentDatastream);
 
   const videolayer = new VideoDataLayer({
     dataSourceId: datasource.id,

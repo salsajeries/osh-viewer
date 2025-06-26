@@ -6,6 +6,7 @@ export const useVisualizationStore = defineStore('visualizations', () => {
   const visualizations: Ref<OSHVisualization[]> = ref([])
 
   const addVisualization = (visualization: OSHVisualization): void => {
+    console.log('[VisualizationStore] Adding visualization:', visualization)
     visualizations.value.push(visualization)
   }
 

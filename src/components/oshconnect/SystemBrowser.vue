@@ -50,6 +50,16 @@ const addVisualization = (item) => {
   const { ds, observedProps } = mineDatasourceObsProps()
 
   console.log('Observed Props:', observedProps)
+
+  const propsList = [
+    'SensorLocation',
+    'sensorLocation',
+    'location',
+    'PlatformLocation',
+    'platformLocation',
+    'Location'
+  ]
+
   if (checkDSForProp('SensorLocation', observedProps)) {
     console.log('Location property found, adding visualization')
     const newMapViz = new OSHVisualization('pointmarker-' + randomUUID(),

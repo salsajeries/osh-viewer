@@ -21,6 +21,7 @@ import ConSysApi from 'osh-js/source/core/datasource/consysapi/ConSysApi.datasou
 import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
 import { fetchSchema, matchPropAndSchema, SchemaFieldProperty } from '@/lib/DatasourceUtils'
 import { useUIStore } from '@/stores/uistore'
+import { SweApiDataSourceProperties, CurveLayerProperties, ChartViewProperties } from '@/lib/VisualizationHelpers'
 
 // Generate a random ID when the component is created
 const chartId = ref('chart-' + randomUUID())
@@ -31,6 +32,21 @@ let chartView: any = null
 const props = defineProps({
   visualization: {
     type: OSHVisualization,
+    required: false,
+    default: null
+  },
+  datasource: {
+    type: SweApiDataSourceProperties,
+    required: false,
+    default: null
+  },
+  curveLayer: {
+    type: CurveLayerProperties,
+    required: false,
+    default: null
+  },
+  chartView: {
+    type: ChartViewProperties,
     required: false,
     default: null
   }
@@ -46,9 +62,7 @@ function setChartDatasource() {
   }
 }
 
-
-onMounted(async () => {
-
+function oldSetupMethod() {
   setChartDatasource()
   const ds = chartDatasource.value;
   console.log('[ChartVue] Chart datasource:', ds)
@@ -113,6 +127,54 @@ onMounted(async () => {
     // })
     // dataSynchronizer.connect();
   }
+}
+
+
+onMounted(async () => {
+  // Create SweApi instance from props.datasource if provided
+  let dsInstance: any = null
+
+  dsInstance = new SweApi('chart-datasource', {
+    endpointUrl: props.datasource.endpointUrl,
+    resource: props.datasource.resource,
+    tls: props.datasource.tls,
+    protocol: props.datasource.protocol,
+    startTime: props.datasource.startTime,
+    endTime: props.datasource.endTime,
+    mode: props.datasource.mode,
+    responseFormat: props.datasource.responseFormat
+  })
+  chartDatasource.value = dsInstance
+  console.log('[ChartVue] Chart datasource created:', chartDatasource.value)
+
+
+  // Create CurveLayer instance from props.curveLayer if provided
+  chartLayer = new CurveLayer({
+    maxValues: props.curveLayer.maxValues,
+    dataSourceId: dsInstance.id,
+    getValues: props.curveLayer.getValues,
+    lineColor: props.curveLayer.lineColor,
+    backgroundColor: props.curveLayer.backgroundColor,
+    fill: props.curveLayer.fill,
+    getCurveId: props.curveLayer.getCurveId,
+    name: props.curveLayer.name
+  })
+  console.log('[ChartVue] Chart layer created:', chartLayer)
+
+
+  // Create ChartJsView instance from props.chartView if provided
+  // chartId.value = props.chartView.container
+
+  chartView = new ChartJsView({
+    container: chartId.value,
+    layers: [chartLayer],
+    css: props.chartView.css,
+    datasetOptions: props.chartView.datasetOptions,
+    refreshRate: props.chartView.refreshRate
+  })
+  console.log('[ChartVue] Chart view created:', chartView)
+
+  dsInstance.connect();
 })
 </script>
 

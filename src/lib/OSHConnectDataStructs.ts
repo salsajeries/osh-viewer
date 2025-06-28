@@ -7,6 +7,7 @@ import DataSynchronizer from 'osh-js/source/core/timesync/DataSynchronizer.js'
 import { useNodeStore } from '@/stores/nodestore'
 import { useSystemStore } from '@/stores/systemstore'
 import { useDataStreamStore } from '@/stores/datastreamstore'
+import { VisualizationComponents } from '@/lib/VisualizationHelpers'
 
 let sharedStores: any = null;
 
@@ -235,6 +236,7 @@ export class OSHVisualization {
   type: string
   parentId: string | null
   parentDatastream: OSHDatastream
+  visualizationComponents!: VisualizationComponents
 
   constructor(id: string, name: string, type: string, parentId: string | null, parentDatastream: OSHDatastream) {
     this.id = id;
@@ -242,5 +244,9 @@ export class OSHVisualization {
     this.type = type;
     this.parentId = parentId;
     this.parentDatastream = parentDatastream;
+  }
+
+  setVisualizationComponents(components: VisualizationComponents): void {
+    this.visualizationComponents = components;
   }
 }

@@ -9,13 +9,16 @@ import Video from '@/components/visualizations/Video.vue'
 import AddChartModal from '@/components/AddChartModal.vue'
 import { useVisualizationStore } from '@/stores/visualizationstore'
 import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
+import VisualizationWizard from './menus/VisualizationWizard.vue'
+import { storeToRefs } from 'pinia'
 
 // Each visualization can be represented by an object with a unique id
 // const visualizations = ref<VisualizationMetadata[]>([])
 const visualizationStore = useVisualizationStore()
-const visualizations = useVisualizationStore().visualizations
+const { visualizations } = storeToRefs(visualizationStore)
 const dataSource = ref<any>(null)
 const dsProps = ref<any[]>([])
+const wizardDialog = ref(false)
 
 /**
  *
@@ -64,8 +67,11 @@ function addVideo() {
 
 <template>
   <v-sheet id="viz-sidebar">
-    <!--    <button @click="addVisualization">Add Visualization</button>-->
-    <!--    <v-btn @click="addChart">Add Chart</v-btn>-->
+    <v-btn @click="wizardDialog = true" class="mb-2">Add Visualization</v-btn>
+    <v-dialog v-model="wizardDialog" max-width="540">
+      <VisualizationWizard />
+    </v-dialog>
+
     <AddChartModal :onAddChart="addChart" :observedProps="dsProps.values" :dsName="'test'"></AddChartModal>
     <v-btn @click="addVideo">Add Video</v-btn>
     <div class="visualization-list">
@@ -74,7 +80,9 @@ function addVideo() {
         :key="viz.id"
         class="visualization-item"
       >
-        <Chart :visualization="viz" v-if="viz.type==='chart'"></Chart>
+        <Chart :visualization="viz" v-if="viz.type==='chart'" :datasource="viz.visualizationComponents.dataSource"
+               :curve-layer="viz.visualizationComponents.dataLayer"
+               :chart-view="viz.visualizationComponents.dataView"></Chart>
         <Video :visualization="viz" v-if="viz.type === 'video'"></Video>
       </div>
     </div>
@@ -86,4 +94,3 @@ function addVideo() {
   width: 100%
 }
 </style>
-

@@ -6,6 +6,7 @@ import VideoDataLayer from 'osh-js/source/core/ui/layer/VideoDataLayer.js'
 import VideoView from 'osh-js/source/core/ui/view/video/VideoView.js'
 import { createDefaultDataSource, createVideoDataSource } from '@/components/visualizations/DataComposables'
 import { OSHDatastream, OSHVisualization } from '@/lib/OSHConnectDataStructs'
+import MJPEGView from 'osh-js/source/core/ui/view/video/MjpegView.js'
 
 const props = defineProps({
   visualization: {
@@ -45,12 +46,24 @@ onMounted(() => {
     getTimestamp: (rec:any) => rec.timestamp,
   })
 
-  const videoView = new VideoView({
+  /*const videoView = new VideoView({
     container: videoDivId.value,
-    css: "video-h264",
+    // css: "video-h264",
     // name: props.videoTitle,
     showTime: true,
     showStats: true,
+    // useWebCodecApi: true,
+    width: 480,
+    height: 360,
+    layers: [videolayer]
+  });*/
+
+  const videoView = new MJPEGView({
+    container: videoDivId.value,
+    css: "video-h264",
+    name: props.videoTitle,
+    showTime: props.showTime,
+    showStats: props.showStats,
     useWebCodecApi: true,
     width: 480,
     height: 360,
@@ -63,11 +76,11 @@ onMounted(() => {
   datasource.connect();
 
   // to find video canvas
-  let canvases = document.getElementById(videoDivId.value)?.getElementsByTagName("canvas")
+/*  let canvases = document.getElementById(videoDivId.value)?.getElementsByTagName("canvas")
   videoCanvas.value = canvases[0] as HTMLCanvasElement;
   console.log('[VideoVue] Video canvas element:', videoCanvas.value);
   videoCanvas.value.classList.add("test-canvas-class");
-  videoCanvas.value.style.width = "480px";
+  videoCanvas.value.style.width = "480px";*/
 });
 
 </script>
@@ -84,5 +97,10 @@ onMounted(() => {
 .video-h264 {
   width: 100%;
   height: 100%;
+}
+.video-container {
+  width: 480px;
+  height: 360px;
+  position: relative;
 }
 </style>

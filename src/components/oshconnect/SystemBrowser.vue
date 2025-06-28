@@ -18,6 +18,7 @@ const visualizationStore = useVisualizationStore()
 const uiStore = useUIStore()
 const activeTab = ref('systems') // Default active tab
 const tabLabels = ref(['Systems', 'DataStreams', 'Nodes'])
+const wizardDialog = ref(false)
 
 const getSystems = () => {
   // This function will be called when the button is clicked
@@ -47,6 +48,7 @@ const addVisualization = (item) => {
   console.log('Item properties:', Object.keys(item));
   console.log('Add Visualization button clicked for item:', item);
   uiStore.setSelectedDatastream(item)
+
   const { ds, observedProps } = mineDatasourceObsProps()
 
   console.log('Observed Props:', observedProps)
@@ -71,6 +73,8 @@ const addVisualization = (item) => {
 
     visualizationStore.addVisualization(newMapViz);
   }
+
+  // wizardDialog.value = true
 }
 
 const getItemChildren = computed(() => {
@@ -119,9 +123,11 @@ const getItemChildren = computed(() => {
         item-title="name"
         color="primary"
         activatable>
+
         <template v-slot:prepend>
           <v-icon icon="mdi-cable-data"></v-icon>
         </template>
+
         <template v-slot:append="{ item }">
           <v-tooltip text="Add Visualization" location="bottom">
             <template #activator="{ props }">
@@ -134,6 +140,7 @@ const getItemChildren = computed(() => {
             </template>
           </v-tooltip>
         </template>
+
       </v-treeview>
     </v-tabs-window-item>
 
@@ -151,6 +158,10 @@ const getItemChildren = computed(() => {
       </v-treeview>
     </v-tabs-window-item>
   </v-tabs-window>
+
+<!--  <v-dialog v-model="wizardDialog" max-width="540">
+    <VisualizationWizard />
+  </v-dialog>-->
 </template>
 
 <style scoped>

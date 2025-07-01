@@ -134,7 +134,7 @@ onMounted(async () => {
   // Create SweApi instance from props.datasource if provided
   let dsInstance: any = null
 
-  dsInstance = new SweApi('chart-datasource', {
+  dsInstance = new ConSysApi('chart-datasource', {
     endpointUrl: props.datasource.endpointUrl,
     resource: props.datasource.resource,
     tls: props.datasource.tls,

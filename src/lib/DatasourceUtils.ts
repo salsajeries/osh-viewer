@@ -193,7 +193,7 @@ export function CreateChartViewProps(ds: OSHDatastream, selectedProperty: any): 
     protocol: 'ws',
     startTime: 'now',
     endTime: '2025-08-01T00:00:00Z',
-    mode: 'REAL_TIME',
+    mode: Mode.REAL_TIME,
     responseFormat: 'application/swe+json'
   }
 

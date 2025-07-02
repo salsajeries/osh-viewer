@@ -83,7 +83,9 @@ function addVideo() {
         <Chart :visualization="viz" v-if="viz.type==='chart'" :datasource="viz.visualizationComponents.dataSource"
                :curve-layer="viz.visualizationComponents.dataLayer"
                :chart-view="viz.visualizationComponents.dataView"></Chart>
-        <Video :visualization="viz" v-if="viz.type === 'video'"></Video>
+        <Video :visualization="viz" :datasource="viz.visualizationComponents.dataSource"
+               :video-layer="viz.visualizationComponents.dataLayer" :video-view="viz.visualizationComponents.dataView"
+               v-if="viz.type === 'video'"></Video>
       </div>
     </div>
   </v-sheet>

@@ -7,6 +7,13 @@ import VideoView from 'osh-js/source/core/ui/view/video/VideoView.js'
 import { createDefaultDataSource, createVideoDataSource } from '@/components/visualizations/DataComposables'
 import { OSHDatastream, OSHVisualization } from '@/lib/OSHConnectDataStructs'
 import MJPEGView from 'osh-js/source/core/ui/view/video/MjpegView.js'
+import {
+  ChartViewProperties,
+  CurveLayerProperties,
+  SweApiDataSourceProperties,
+  VideoLayerProperties, VideoViewProperties
+} from '@/lib/VisualizationHelpers'
+import ConSysApi from 'osh-js/source/core/datasource/consysapi/ConSysApi.datasource'
 
 const props = defineProps({
   visualization: {
@@ -28,6 +35,21 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: true
+  },
+  datasource: {
+    type: SweApiDataSourceProperties,
+    required: false,
+    default: null
+  },
+  videoLayer: {
+    type: VideoLayerProperties,
+    required: false,
+    default: null
+  },
+  videoView: {
+    type: VideoViewProperties,
+    required: false,
+    default: null
   }
 })
 
@@ -35,15 +57,15 @@ const videoDivId = ref('video-' + randomUUID());
 const videoCanvas = ref<HTMLCanvasElement | null>(null);
 // const datasource = createDefaultDataSource(props.datastream)
 
-onMounted(() => {
-  console.log('Video component mounted with OSHVisualization:', props.visualization);
+function oldSetup() {
+  console.log('Video component mounted with OSHVisualization:', props.visualization)
 
-  const datasource = createVideoDataSource(props.visualization.parentDatastream);
+  const datasource = createVideoDataSource(props.visualization.parentDatastream)
 
   const videolayer = new VideoDataLayer({
     dataSourceId: datasource.id,
-    getFrameData: (rec:any) =>  rec.img,
-    getTimestamp: (rec:any) => rec.timestamp,
+    getFrameData: (rec: any) => rec.img,
+    getTimestamp: (rec: any) => rec.timestamp
   })
 
   /*const videoView = new VideoView({
@@ -60,7 +82,7 @@ onMounted(() => {
 
   const videoView = new MJPEGView({
     container: videoDivId.value,
-    css: "video-h264",
+    css: 'video-h264',
     name: props.videoTitle,
     showTime: props.showTime,
     showStats: props.showStats,
@@ -68,19 +90,70 @@ onMounted(() => {
     width: 480,
     height: 360,
     layers: [videolayer]
-  });
+  })
   // NOTE: The width and height parameters are disregarded in the standard OSH-JS.
   // If yours is not working, you may have to modify the source code of the VideoView class.
   // And you may need to modify WebCodecView, FFMPEGView, etc.
 
-  datasource.connect();
+  datasource.connect()
 
   // to find video canvas
-/*  let canvases = document.getElementById(videoDivId.value)?.getElementsByTagName("canvas")
-  videoCanvas.value = canvases[0] as HTMLCanvasElement;
-  console.log('[VideoVue] Video canvas element:', videoCanvas.value);
-  videoCanvas.value.classList.add("test-canvas-class");
-  videoCanvas.value.style.width = "480px";*/
+  /*  let canvases = document.getElementById(videoDivId.value)?.getElementsByTagName("canvas")
+    videoCanvas.value = canvases[0] as HTMLCanvasElement;
+    console.log('[VideoVue] Video canvas element:', videoCanvas.value);
+    videoCanvas.value.classList.add("test-canvas-class");
+    videoCanvas.value.style.width = "480px";*/
+}
+
+onMounted(() => {
+  let dsInstance: any = new ConSysApi('video-datasource', {
+    endpointUrl: props.datasource.endpointUrl,
+    resource: props.datasource.resource,
+    tls: props.datasource.tls,
+    protocol: props.datasource.protocol,
+    startTime: props.datasource.startTime,
+    endTime: props.datasource.endTime,
+    mode: props.datasource.mode,
+    responseFormat: props.datasource.responseFormat
+  })
+
+  let videolayer = new VideoDataLayer({
+    dataSourceId: dsInstance.id,
+    getFrameData: props.videoLayer.getFrameData,
+    getTimestamp: props.videoLayer.getTimestamp
+  })
+
+  let videoView: any = null
+  if (props.videoView.videoType !== 'MJPEG') {
+    videoView = new VideoView({
+      container: videoDivId.value,
+      css: 'video-h264',
+      name: props.visualization.name,
+      showTime: props.videoView.showTime,
+      showStats: props.videoView.showStats,
+      useWebCodecApi: true,
+      width: props.videoView.width,
+      height: props.videoView.height,
+      layers: [videolayer]
+    })
+  } else {
+    videoView = new MJPEGView({
+      container: videoDivId.value,
+      css: 'video-h264',
+      name: props.visualization.name,
+      showTime: props.videoView.showTime,
+      showStats: props.videoView.showStats,
+      useWebCodecApi: true,
+      width: props.videoView.width,
+      height: props.videoView.height,
+      layers: [videolayer]
+    })
+  }
+
+  console.log('[VideoVue] Video visulizations info', dsInstance, videolayer, videoView)
+
+  // TODO: check videoView type and create appropriate view
+  dsInstance.connect()
 });
 
 </script>

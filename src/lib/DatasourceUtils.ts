@@ -6,7 +6,12 @@ import ChartJsView from 'osh-js/source/core/ui/view/chart/ChartJsView.js'
 import CurveLayer from 'osh-js/source/core/ui/layer/CurveLayer.js'
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 import { OSHDatastream } from '@/lib/OSHConnectDataStructs'
-import { IChartViewProperties, ICurveLayerProperties, ISweApiDataSourceProperties } from '@/lib/VisualizationHelpers'
+import {
+  IChartViewProperties,
+  ICurveLayerProperties,
+  ISweApiDataSourceProperties, IVideoLayerProperties,
+  IVideoViewProperties
+} from '@/lib/VisualizationHelpers'
 
 
 export function mineDatasourceObsProps(): {ds: any, observedProps: any} {
@@ -178,7 +183,7 @@ export function CreateChartView(ds: OSHDatastream, selectedProperty: any): any {
     chartView: chartView
   }
 
-}
+  }
 
 export function CreateChartViewProps(ds: OSHDatastream, selectedProperty: any): {
   dataSource: ISweApiDataSourceProperties,
@@ -229,5 +234,55 @@ export function CreateChartViewProps(ds: OSHDatastream, selectedProperty: any): 
     dataSource,
     chartLayer,
     chartView
+  }
+}
+
+export function CreateVideoViewProps(ds: OSHDatastream, selectedProperty: any, videoFormat: any): {
+  dataSource: ISweApiDataSourceProperties
+  videoLayer: IVideoLayerProperties,
+  videoView: IVideoViewProperties
+} {
+  console.log('[DatasourceUtils] Creating Video View for Datastream:', ds)
+
+  const dataSource: ISweApiDataSourceProperties = {
+    endpointUrl: ds.datastream.networkProperties.endpointUrl,
+    resource: `/datastreams/${ds.datastream.properties.id}/observations`,
+    tls: false,
+    protocol: 'ws',
+    startTime: 'now',
+    endTime: '2025-08-01T00:00:00Z',
+    mode: Mode.REAL_TIME,
+    responseFormat: 'application/swe+binary'
+  }
+
+  const videoLayer: IVideoLayerProperties = {
+    dataSourceId: ds.datastream.properties.id,
+    getFrameData(rec, timestamp) {
+        return rec[selectedProperty.name]
+    },
+    getTimestamp(rec, timestamp) {
+        return rec.timestamp
+    }
+  }
+
+  console.log('[DatasourceUtils] Video Format:', videoFormat)
+
+  const videoView: IVideoViewProperties = {
+    container: `video-container-${randomUUID()}`,
+    css: 'video-view',
+    name: `${selectedProperty.label}`,
+    layers: [videoLayer],
+    width: 640,
+    height: 480,
+    useWebCodecApi: videoFormat === 'MJPEG' ? false : true,
+    showTime: true,
+    showStats: true,
+    videoType: videoFormat
+  }
+
+  return {
+    dataSource,
+    videoLayer,
+    videoView
   }
 }

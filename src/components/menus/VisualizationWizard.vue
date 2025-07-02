@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useUIStore } from '@/stores/uistore'
 import ChartOptions from '@/components/menus/ChartOptions.vue'
 import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
-import { CreateChartView, CreateChartViewProps } from '@/lib/DatasourceUtils'
+import { CreateChartView, CreateChartViewProps, CreateVideoViewProps } from '@/lib/DatasourceUtils'
 import { VisualizationComponents } from '@/lib/VisualizationHelpers'
 import { useVisualizationStore } from '@/stores/visualizationstore'
 import { storeToRefs } from 'pinia'
+import VideoOptions from '@/components/menus/VideoOptions.vue'
 
 const uiStore = useUIStore();
 const { selectedDatastream } = storeToRefs(uiStore);
@@ -16,6 +17,8 @@ const vizStore = useVisualizationStore();
 const step = ref(0)
 const selectedType = ref('')
 const selectedDSProperty = ref(null)
+const selectedVisualizationOptions = ref(null)
+
 const visualizationName = ref('')
 const visualizationComponents = ref<VisualizationComponents | undefined>(undefined)
 const visualizationSweApi = ref(null)
@@ -73,15 +76,22 @@ function createVisualization() {
   let visualizationComponents: VisualizationComponents | undefined = undefined;
   switch (newViz.type) {
     case 'chart':
-      const result = CreateChartViewProps(selectedDatastream.value, selectedDSProperty.value);
+      const chartResult = CreateChartViewProps(selectedDatastream.value, selectedDSProperty.value);
       visualizationComponents = {
-        dataSource: result.dataSource,
-        dataLayer: result.chartLayer,
-        dataView: result.chartView
+        dataSource: chartResult.dataSource,
+        dataLayer: chartResult.chartLayer,
+        dataView: chartResult.chartView
       }
       break;
     case 'video':
       // Add video-specific properties if needed
+      const videoResult = CreateVideoViewProps(selectedDatastream.value, selectedDSProperty.value,
+        selectedVisualizationOptions.value);
+      visualizationComponents = {
+        dataSource: videoResult.dataSource,
+        dataLayer: videoResult.videoLayer,
+        dataView: videoResult.videoView
+      }
       break;
     case 'map':
       // Add map-specific properties if needed
@@ -93,11 +103,18 @@ function createVisualization() {
       console.warn('Unknown visualization type:', newViz.type);
   }
 
+  console.log('[VizWiz] Creating new visualization:', newViz, visualizationComponents);
+
   return {
     visualization: newViz,
     components: visualizationComponents
   };
 }
+
+// Log selectedVisualizationOptions as it changes
+watch(selectedVisualizationOptions, (val) => {
+  console.log('[VizWiz] selectedVisualizationOptions changed:', val)
+})
 </script>
 
 <template>
@@ -117,6 +134,7 @@ function createVisualization() {
         <v-icon icon="mdi-chevron-right"></v-icon>
       </template>
     </v-breadcrumbs>
+
     <div v-if="step === 0">
       <h2 class="mb-4 text-center">Choose Visualization Type</h2>
       <v-row justify="center" align="center" class="mb-2">
@@ -139,13 +157,15 @@ function createVisualization() {
         </v-col>
       </v-row>
     </div>
+
     <div v-else-if="step === 1">
       <h2 class="mb-4 text-center">Datasource Options</h2>
       <div v-if="selectedType === 'chart'">
         <ChartOptions v-model:selectedProperty="selectedDSProperty"/>
       </div>
       <div v-else-if="selectedType === 'video'">
-        <v-alert type="info">Video options coming soon...</v-alert>
+        <VideoOptions v-model:selectedProperty="selectedDSProperty"
+                      v-model:videoType="selectedVisualizationOptions" />
       </div>
       <div v-else-if="selectedType === 'map'">
         <v-alert type="info">Map marker options coming soon...</v-alert>
@@ -161,6 +181,7 @@ function createVisualization() {
       <h2 class="mb-4 text-center">Visualization Customization</h2>
       <div class="text-grey text-center">(Mockup step)</div>
     </div>
+
     <v-row class="mt-6" justify="end">
       <v-btn
         v-if="step > 0"

@@ -56,6 +56,25 @@ export interface IChartViewProperties extends DataViewProperties{
   refreshRate?: number
 }
 
+export interface IVideoLayerProperties extends DataLayerProperties {
+  dataSourceId: ISweApiDataSourceProperties
+  getFrameData: (rec: any, timestamp: any) => any
+  getTimestamp: (rec: any, timestamp: any) => any
+}
+
+export interface IVideoViewProperties extends DataViewProperties {
+  container: string
+  css: string
+  name: string
+  showTime: boolean
+  showStats: boolean
+  useWebCodecApi: boolean
+  width: number
+  height: number
+  layers: IVideoLayerProperties[]
+  videoType: string
+}
+
 export class VisualizationComponents {
   dataLayer: DataLayerProperties
   dataView: DataViewProperties
@@ -125,5 +144,42 @@ export class ChartViewProperties implements IChartViewProperties {
     this.css = props.css;
     this.datasetOptions = props.datasetOptions;
     this.refreshRate = props.refreshRate;
+  }
+}
+
+export class VideoLayerProperties implements IVideoLayerProperties {
+  dataSourceId: SweApiDataSourceProperties;
+  getFrameData: (rec: any, timestamp: any) => any;
+  getTimestamp: (rec: any, timestamp: any) => any;
+
+  constructor(props: IVideoLayerProperties) {
+    this.dataSourceId = props.dataSourceId;
+    this.getFrameData = props.getFrameData;
+    this.getTimestamp = props.getTimestamp;
+  }
+}
+
+export class VideoViewProperties implements DataViewProperties {
+  container: string;
+  css: string;
+  name: string;
+  showTime: boolean;
+  showStats: boolean;
+  useWebCodecApi: boolean;
+  width: number;
+  height: number;
+  layers: VideoLayerProperties[];
+  videoType: string;
+
+  constructor(props: IVideoViewProperties) {
+    this.container = props.container;
+    this.css = props.css;
+    this.name = props.name;
+    this.showTime = props.showTime;
+    this.showStats = props.showStats;
+    this.useWebCodecApi = props.useWebCodecApi;
+    this.width = props.width;
+    this.height = props.height;
+    this.layers = props.layers.map(layer => new VideoLayerProperties(layer));
   }
 }

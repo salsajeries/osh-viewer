@@ -6,6 +6,7 @@ export const useUIStore = defineStore('ui', () => {
   // Sidebar state (example: left and right sidebars)
   const leftSidebarOpen = ref(true)
   const rightSidebarOpen = ref(false)
+  const visualizationWizardOpen = ref(false)
 
   // Focused map (could be an ID or name)
   const focusedMap = ref<string | null>(null)
@@ -52,6 +53,12 @@ export const useUIStore = defineStore('ui', () => {
   function toggleTheme() {
     theme.value = theme.value === 'dark' ? 'light' : 'dark'
   }
+  function toggleVisualizationWizard() {
+    visualizationWizardOpen.value = !visualizationWizardOpen.value
+  }
+  function openVisualizationWizard() {
+    visualizationWizardOpen.value = true
+  }
 
   return {
     leftSidebarOpen,
@@ -70,5 +77,8 @@ export const useUIStore = defineStore('ui', () => {
     setSelectedProperty,
     theme,
     toggleTheme,
+    visualizationWizardOpen,
+    toggleVisualizationWizard,
+    openVisualizationWizard
   }
 })

@@ -19,6 +19,8 @@ const { visualizations } = storeToRefs(visualizationStore)
 const dataSource = ref<any>(null)
 const dsProps = ref<any[]>([])
 const wizardDialog = ref(false)
+const uiStore = storeToRefs(useUIStore());
+const visualizationWizardOpen = uiStore.visualizationWizardOpen;
 
 /**
  *
@@ -67,8 +69,8 @@ function addVideo() {
 
 <template>
   <v-sheet id="viz-sidebar">
-    <v-btn @click="wizardDialog = true" class="mb-2">Add Visualization</v-btn>
-    <v-dialog v-model="wizardDialog" max-width="540">
+    <v-btn @click="visualizationWizardOpen = true" class="mb-2">Add Visualization</v-btn>
+    <v-dialog v-model="visualizationWizardOpen" max-width="540">
       <VisualizationWizard />
     </v-dialog>
 

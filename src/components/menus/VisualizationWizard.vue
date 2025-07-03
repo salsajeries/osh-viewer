@@ -67,7 +67,7 @@ function submitWizard() {
   }
   // TODO: Implement submit logic
   // For now, just close or reset
-  alert('Visualization submitted!')
+  uiStore.visualizationWizardOpen = false;
 }
 
 function createVisualization() {

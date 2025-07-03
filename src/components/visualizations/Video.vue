@@ -13,7 +13,7 @@ import {
   SweApiDataSourceProperties,
   VideoLayerProperties, VideoViewProperties
 } from '@/lib/VisualizationHelpers'
-import ConSysApi from 'osh-js/source/core/datasource/consysapi/ConSysApi.datasource'
+import SweApi from 'osh-js/source/core/datasource/sweapi/SweApi.datasource.js'
 
 const props = defineProps({
   visualization: {
@@ -106,7 +106,7 @@ function oldSetup() {
 }
 
 onMounted(() => {
-  let dsInstance: any = new ConSysApi('video-datasource', {
+  let dsInstance: any = new SweApi('video-datasource', {
     endpointUrl: props.datasource.endpointUrl,
     resource: props.datasource.resource,
     tls: props.datasource.tls,

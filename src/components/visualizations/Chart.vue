@@ -1,27 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted, defineProps } from 'vue'
+import { defineProps, onMounted, ref } from 'vue'
 // @ts-ignore
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 // @ts-ignore
 import { createDefaultDataSource } from './DataComposables'
 // @ts-ignore
-import SweApi  from 'osh-js/source/core/datasource/sweapi/SweApi.datasource.js'
-// import SweApiDatasource from "osh-js/core/datasource/sweapi/SweApi.datasource";
-// import DataSynchronizer from 'osh-js/core/timesync/DataSynchronizer';
+import SweApi from 'osh-js/source/core/datasource/sweapi/SweApi.datasource.js'
 // @ts-ignore
 import { Mode } from 'osh-js/source/core/datasource/Mode'
 // @ts-ignore
 import ChartJsView from 'osh-js/source/core/ui/view/chart/ChartJsView.js'
 // @ts-ignore
 import CurveLayer from 'osh-js/source/core/ui/layer/CurveLayer.js'
-import DataSynchronizer from 'osh-js/source/core/timesync/DataSynchronizer.js'
-import DataStreamFilter from 'osh-js/source/core/sweapi/datastream/DataStreamFilter.js'
-
-import ConSysApi from 'osh-js/source/core/datasource/consysapi/ConSysApi.datasource'
 import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
-import { fetchSchema, matchPropAndSchema, SchemaFieldProperty } from '@/lib/DatasourceUtils'
 import { useUIStore } from '@/stores/uistore'
-import { SweApiDataSourceProperties, CurveLayerProperties, ChartViewProperties } from '@/lib/VisualizationHelpers'
+import { ChartViewProperties, CurveLayerProperties, SweApiDataSourceProperties } from '@/lib/VisualizationHelpers'
 
 // Generate a random ID when the component is created
 const chartId = ref('chart-' + randomUUID())
@@ -134,7 +127,7 @@ onMounted(async () => {
   // Create SweApi instance from props.datasource if provided
   let dsInstance: any = null
 
-  dsInstance = new ConSysApi('chart-datasource', {
+  dsInstance = new SweApi('chart-datasource', {
     endpointUrl: props.datasource.endpointUrl,
     resource: props.datasource.resource,
     tls: props.datasource.tls,

@@ -32,3 +32,4 @@ OSH JS Issues
 3.0.0
 3. Cesium import
     - `  createDefaultImageryProviderViewModels,` doesn't exist in certain versions of Cesium and appears unused.
+4. LeafletView unused 'assert' import

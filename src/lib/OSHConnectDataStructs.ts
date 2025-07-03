@@ -1,8 +1,8 @@
 // @ts-ignore
 import { randomUUID }  from 'osh-js/source/core/utils/Utils.js'
-import Systems from 'osh-js/source/core/consysapi/system/Systems.js'
-import SystemFilter from 'osh-js/source/core/consysapi/system/SystemFilter.js'
-import System from 'osh-js/source/core/consysapi/system/System.js'
+import Systems from 'osh-js/source/core/sweapi/system/Systems.js'
+import SystemFilter from 'osh-js/source/core/sweapi/system/SystemFilter.js'
+import System from 'osh-js/source/core/sweapi/system/System.js'
 import DataSynchronizer from 'osh-js/source/core/timesync/DataSynchronizer.js'
 import { useNodeStore } from '@/stores/nodestore'
 import { useSystemStore } from '@/stores/systemstore'

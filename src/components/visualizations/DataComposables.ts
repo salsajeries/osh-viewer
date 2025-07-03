@@ -1,5 +1,6 @@
 import { Mode } from 'osh-js/source/core/datasource/Mode'
-import ConSysApi from 'osh-js/source/core/datasource/consysapi/ConSysApi.datasource'
+// import ConSysApi from 'osh-js/source/core/datasource/consysapi/ConSysApi.datasource'
+import SweApi from 'osh-js/source/core/datasource/sweapi/SweApi.datasource'
 import { OSHDatastream } from '@/lib/OSHConnectDataStructs'
 
 /**
@@ -11,7 +12,7 @@ export function createDefaultDataSource(datastream: OSHDatastream) {
   // const datasource = ref(null);
 
   // TODO: determine how initializing the datasource in the onMounted hook behaves
-  const datasource = new ConSysApi(datastream.name, {
+  const datasource = new SweApi(datastream.name, {
     endpointUrl: datastream.datastream.networkProperties.endpointUrl,
     resource: `/datastreams/${datastream.datastream.properties.id}/observations`,
     tls: false,
@@ -43,7 +44,7 @@ export function createVideoDataSource(datastream: OSHDatastream) {
   // const datasource = ref(null);
 
   // TODO: determine how initializing the datasource in the onMounted hook behaves
-  const datasource = new ConSysApi(datastream.name, {
+  const datasource = new SweApi(datastream.name, {
     protocol: 'ws',
     endpointUrl: datastream.datastream.networkProperties.endpointUrl,
     resource: `/datastreams/${datastream.datastream.properties.id}/observations`,
@@ -72,7 +73,7 @@ export function createVideoDataSource(datastream: OSHDatastream) {
 }
 
 export function createLocationDataSource(datastream: OSHDatastream) {
-  const datasource = new ConSysApi(datastream.name, {
+  const datasource = new SweApi(datastream.name, {
     protocol: 'ws',
     endpointUrl: datastream.datastream.networkProperties.endpointUrl,
     resource: `/datastreams/${datastream.datastream.properties.id}/observations`,

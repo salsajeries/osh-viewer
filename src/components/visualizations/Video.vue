@@ -1,18 +1,13 @@
 <script setup lang="ts">
 
-import { ref, onMounted, defineProps} from 'vue'
+import { defineProps, onMounted, ref } from 'vue'
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 import VideoDataLayer from 'osh-js/source/core/ui/layer/VideoDataLayer.js'
 import VideoView from 'osh-js/source/core/ui/view/video/VideoView.js'
-import { createDefaultDataSource, createVideoDataSource } from '@/components/visualizations/DataComposables'
-import { OSHDatastream, OSHVisualization } from '@/lib/OSHConnectDataStructs'
+import { createVideoDataSource } from '@/components/visualizations/DataComposables'
+import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
 import MJPEGView from 'osh-js/source/core/ui/view/video/MjpegView.js'
-import {
-  ChartViewProperties,
-  CurveLayerProperties,
-  SweApiDataSourceProperties,
-  VideoLayerProperties, VideoViewProperties
-} from '@/lib/VisualizationHelpers'
+import { SweApiDataSourceProperties, VideoLayerProperties, VideoViewProperties } from '@/lib/VisualizationHelpers'
 import SweApi from 'osh-js/source/core/datasource/sweapi/SweApi.datasource.js'
 
 const props = defineProps({
@@ -55,7 +50,8 @@ const props = defineProps({
 
 const videoDivId = ref('video-' + randomUUID());
 const videoCanvas = ref<HTMLCanvasElement | null>(null);
-// const datasource = createDefaultDataSource(props.datastream)
+const videoHeight = ref(360);
+const videoWidth = ref(480);
 
 function oldSetup() {
   console.log('Video component mounted with OSHVisualization:', props.visualization)
@@ -132,8 +128,8 @@ onMounted(() => {
       showTime: props.videoView.showTime,
       showStats: props.videoView.showStats,
       useWebCodecApi: true,
-      width: props.videoView.width,
-      height: props.videoView.height,
+      width: videoWidth.value,
+      height: videoHeight.value,
       layers: [videolayer]
     })
   } else {
@@ -144,13 +140,13 @@ onMounted(() => {
       showTime: props.videoView.showTime,
       showStats: props.videoView.showStats,
       useWebCodecApi: true,
-      width: props.videoView.width,
-      height: props.videoView.height,
+      width: videoWidth.value,
+      height: videoHeight.value,
       layers: [videolayer]
     })
   }
 
-  console.log('[VideoVue] Video visulizations info', dsInstance, videolayer, videoView)
+  console.log('[VideoVue] Video visualizations info', dsInstance, videolayer, videoView)
 
   // TODO: check videoView type and create appropriate view
   dsInstance.connect()
@@ -160,9 +156,9 @@ onMounted(() => {
 
 <template>
 
-  <div :id="videoDivId" class="video-container">
+  <v-card :id="videoDivId" class="video-container" :style="{ width: videoWidth + 'px', height: videoHeight + 'px' }">
     <!-- Video content will be rendered here -->
-  </div>
+  </v-card>
 
 </template>
 

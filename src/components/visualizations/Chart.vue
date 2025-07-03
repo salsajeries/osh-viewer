@@ -172,11 +172,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div :id="chartId">
-    <p>{{visualization.name}}</p>
-  </div>
+  <v-card class="chart-card pa-4">
+    <v-card-title>{{visualization.name}}</v-card-title>
+    <div :id="chartId"/>
+  </v-card>
 </template>
 
 <style scoped>
-
+.chart-card {
+  height: 20vh;
+}
 </style>

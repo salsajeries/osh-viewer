@@ -74,7 +74,7 @@ function addVideo() {
 
     <AddChartModal :onAddChart="addChart" :observedProps="dsProps.values" :dsName="'test'"></AddChartModal>
     <v-btn @click="addVideo">Add Video</v-btn>
-    <div class="visualization-list">
+    <v-sheet class="visualization-list">
       <div
         v-for="viz in visualizations"
         :key="viz.id"
@@ -87,12 +87,21 @@ function addVideo() {
                :video-layer="viz.visualizationComponents.dataLayer" :video-view="viz.visualizationComponents.dataView"
                v-if="viz.type === 'video'"></Video>
       </div>
-    </div>
+    </v-sheet>
   </v-sheet>
 </template>
 
 <style scoped>
 #viz-sidebar {
-  width: 100%
+  width: 100%;
+  height: 100%;
+}
+
+.visualization-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: scroll;
+  max-height: 90vh;
 }
 </style>

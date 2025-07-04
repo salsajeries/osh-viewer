@@ -72,7 +72,9 @@ function submitWizard() {
 
 function createVisualization() {
 
-  const newViz = new OSHVisualization(`visualization-${randomUUID()}`, visualizationName.value, selectedType.value, null, selectedDatastream.value);
+  const newViz = new OSHVisualization(`visualization-${randomUUID()}`, visualizationName.value,
+    selectedType.value, null, selectedDatastream.value);
+
   let visualizationComponents: VisualizationComponents | undefined = undefined;
   switch (newViz.type) {
     case 'chart':

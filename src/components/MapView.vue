@@ -55,6 +55,10 @@ onMounted(() => {
     return visualizationStore.getVisualizationsByType('pointmarker')
   })
 
+  const featureVisualizations = computed(() => {
+    return visualizationStore.getVisualizationsByType('pointmarker-feature')
+  })
+
   watch(mapVisualizations, (updated) => {
     // do stuff with new items in list
     const remFiltered = currentVisualizations.value.filter(val => !updated.includes(val))
@@ -81,6 +85,40 @@ onMounted(() => {
       leafletMapView.addLayer(pmLayer)
       datasource.connect()
     }
+  }, { deep: true })
+
+  watch(featureVisualizations, (updated) => {
+    console.log('Feature visualizations updated:', updated)
+    const newFiltered = updated.filter(val => !currentVisualizations.value.includes(val))
+
+    for (const viz of newFiltered) {
+      const pmLayer = new PointMarkerLayer({
+        name: viz.name,
+        dataSourceIds: [],
+        location: {
+          x: viz.geometry.coordinates[0],
+          y: viz.geometry.coordinates[1],
+          z: viz.geometry.coordinates[2]
+        }
+      })
+
+      console.log('[MapView] Adding feature visualization layer:', pmLayer)
+
+      pmLayers.value.push(pmLayer)
+      leafletMapView.addMarker({
+        location: {
+          x: viz.geometry.coordinates[0],
+          y: viz.geometry.coordinates[1],
+          z: viz.geometry.coordinates[2]
+        },
+        label: viz.name,
+        labelOffset: [0, 0],
+        icon: '/icons/map/map-marker.svg',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32]
+      })
+    }
+
   }, { deep: true })
 })
 

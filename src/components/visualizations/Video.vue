@@ -156,7 +156,8 @@ onMounted(() => {
 
 <template>
 
-  <v-card :id="videoDivId" class="video-container" :style="{ width: videoWidth + 'px', height: videoHeight + 'px' }">
+  <v-card :id="videoDivId" class="video-container pa-4" :style="{ width: videoWidth + 'px', height: videoHeight + 'px' }">
+    <v-card-title class="text-h5 text-center">{{ props.visualization.name || props.videoTitle }}</v-card-title>
     <!-- Video content will be rendered here -->
   </v-card>
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useSystemStore } from '@/stores/systemstore.ts'
 import { useNodeStore } from '@/stores/nodestore.js'
@@ -7,19 +7,25 @@ import { useDataStreamStore } from '@/stores/datastreamstore.js'
 import { useUIStore } from '@/stores/uistore.ts'
 import { useVisualizationStore } from '@/stores/visualizationstore.js'
 import { checkDSForProp, mineDatasourceObsProps } from '@/lib/DatasourceUtils.js'
-import { OSHVisualization } from '@/lib/OSHConnectDataStructs.js'
+import { OSHSystem, OSHVisualization } from '@/lib/OSHConnectDataStructs.js'
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
+import VisualizationWizard from '@/components/menus/VisualizationWizard.vue'
+import { storeToRefs } from 'pinia'
+import { Geometry } from '@/lib/OSHConnectDefinitions'
 
 const oshConnect = useOSHConnectStore().getInstance();
 const nodeStore = useNodeStore()
 const systems = useSystemStore().systems
 const datastreamStore = useDataStreamStore()
 const visualizationStore = useVisualizationStore()
-const uiStore = useUIStore()
+const uiStore = storeToRefs(useUIStore())
+const setSelectedDatastream = useUIStore().setSelectedDatastream
 const activeTab = ref('systems') // Default active tab
 const tabLabels = ref(['Systems', 'DataStreams', 'Nodes'])
-const wizardDialog = ref(false)
+const visualizationWizardOpen = uiStore.visualizationWizardOpen
+const openVisualizationWizard = useUIStore().openVisualizationWizard
 
+/*
 const getSystems = () => {
   // This function will be called when the button is clicked
   console.log('Get Systems button clicked')
@@ -38,6 +44,7 @@ const getAllDatastreams = () => {
     node.getAllDataStreams()
   })
 }
+*/
 
 const fetchResources = () => {
   console.log('Fetch Resources button clicked', oshConnect)
@@ -47,7 +54,7 @@ const fetchResources = () => {
 const addVisualization = (item) => {
   console.log('Item properties:', Object.keys(item));
   console.log('Add Visualization button clicked for item:', item);
-  uiStore.setSelectedDatastream(item)
+  setSelectedDatastream(item)
 
   const { ds, observedProps } = mineDatasourceObsProps()
 
@@ -75,6 +82,30 @@ const addVisualization = (item) => {
   }
 
   // wizardDialog.value = true
+  openVisualizationWizard()
+}
+
+const addFeatureMarker = (item) => {
+  console.log('Add Feature Marker button clicked for item:', item)
+  const oshSystem: OSHSystem = item as OSHSystem
+
+  for (let foi of oshSystem.samplingFeatures) {
+    console.log('Feature of Interest:', foi)
+
+    const geom = new Geometry(foi.properties.id, foi.properties.geometry.type, foi.properties.geometry.coordinates, foi.properties, foi.properties.bbox)
+    console.log('SamplingFeature Geometry:', geom)
+
+    let newViz = new OSHVisualization('featuremarker-' + randomUUID(),
+      foi.properties.name || foi.properties.id,
+      'pointmarker-feature',
+      null,
+      undefined
+    );
+    newViz.geometry = geom
+
+    visualizationStore.addVisualization(newViz);
+
+  }
 }
 
 const getItemChildren = computed(() => {
@@ -96,8 +127,8 @@ const getItemChildren = computed(() => {
     </v-tab>
   </v-tabs>
   <v-btn @click="fetchResources">Fetch Resources</v-btn>
-  <v-btn @click="getSystems">Get Systems</v-btn>
-  <v-btn @click="getAllDatastreams">Get DataStreams</v-btn>
+  <!--  <v-btn @click="getSystems">Get Systems</v-btn>
+    <v-btn @click="getAllDatastreams">Get DataStreams</v-btn>-->
 
   <v-tabs-window v-model="activeTab">
     <v-tabs-window-item value="systems">
@@ -111,6 +142,9 @@ const getItemChildren = computed(() => {
         activatable>
         <template v-slot:prepend>
           <v-icon icon="mdi-cogs"></v-icon>
+        </template>
+        <template v-slot:append="{ item }">
+          <v-btn icon="mdi-map-marker-plus" @click="() => addFeatureMarker(item)"></v-btn>
         </template>
       </v-treeview>
     </v-tabs-window-item>
@@ -159,9 +193,10 @@ const getItemChildren = computed(() => {
     </v-tabs-window-item>
   </v-tabs-window>
 
-<!--  <v-dialog v-model="wizardDialog" max-width="540">
+  <!--  <v-btn @click="visualizationWizardOpen = true" class="mb-2">Add Visualization</v-btn>-->
+  <v-dialog v-model="visualizationWizardOpen" max-width="540">
     <VisualizationWizard />
-  </v-dialog>-->
+  </v-dialog>
 </template>
 
 <style scoped>

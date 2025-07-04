@@ -68,14 +68,13 @@ function addVideo() {
 </script>
 
 <template>
-  <v-sheet id="viz-sidebar">
-    <v-btn @click="visualizationWizardOpen = true" class="mb-2">Add Visualization</v-btn>
-    <v-dialog v-model="visualizationWizardOpen" max-width="540">
-      <VisualizationWizard />
-    </v-dialog>
+  <v-card id="viz-sidebar">
+    <v-card-title class="viz-title ma-4">Visualizations</v-card-title>
+    <v-divider></v-divider>
 
-    <AddChartModal :onAddChart="addChart" :observedProps="dsProps.values" :dsName="'test'"></AddChartModal>
-    <v-btn @click="addVideo">Add Video</v-btn>
+
+    <!--    <AddChartModal :onAddChart="addChart" :observedProps="dsProps.values" :dsName="'test'"></AddChartModal>-->
+    <!--    <v-btn @click="addVideo">Add Video</v-btn>-->
     <v-sheet class="visualization-list">
       <div
         v-for="viz in visualizations"
@@ -90,13 +89,20 @@ function addVideo() {
                v-if="viz.type === 'video'"></Video>
       </div>
     </v-sheet>
-  </v-sheet>
+  </v-card>
 </template>
 
 <style scoped>
 #viz-sidebar {
   width: 100%;
   height: 100%;
+}
+
+.viz-title {
+  text-align: center;
+  width: 100%;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .visualization-list {

@@ -4,6 +4,7 @@ import Systems from 'osh-js/source/core/sweapi/system/Systems.js'
 import SystemFilter from 'osh-js/source/core/sweapi/system/SystemFilter.js'
 import System from 'osh-js/source/core/sweapi/system/System.js'
 import DataSynchronizer from 'osh-js/source/core/timesync/DataSynchronizer.js'
+import FeatureOfInterestFilter from 'osh-js/source/core/sweapi/featureofinterest/FeatureOfInterestFilter.js'
 import { useNodeStore } from '@/stores/nodestore'
 import { useSystemStore } from '@/stores/systemstore'
 import { useDataStreamStore } from '@/stores/datastreamstore'
@@ -131,6 +132,7 @@ export class OSHNode {
       if (!systemStore?.checkIfSystemExists?.(sys.properties.id)) {
         const newSys = new OSHSystem(sys, this);
         newSys.getDataStreams();
+        newSys.getSamplingFeatures();
         systemStore?.addSystem?.(newSys);
         return newSys;
       }
@@ -156,6 +158,7 @@ export class OSHSystem {
   parentNode: OSHNode;
   children: string[];
   subsystems: string[] = [];
+  samplingFeatures: any[]= [];
 
   constructor(system: any, parentNode: OSHNode) {
     this.uuid = randomUUID();
@@ -187,6 +190,19 @@ export class OSHSystem {
       });
     }
     return dataStreams;
+  }
+
+  async getSamplingFeatures(): Promise<any[]> {
+    const result: any = await this.system.searchFeaturesOfInterest(new FeatureOfInterestFilter(), 100);
+    let samplingFeatures: any[] = [];
+
+    while (result.hasNext()) {
+      const items: any[] = await result.nextPage();
+      samplingFeatures.push(...items);
+    }
+    this.samplingFeatures = samplingFeatures;
+    console.log('[OSHConnect-System] Collected sampling features:', samplingFeatures);
+    return samplingFeatures;
   }
 
   getDSChildren(): OSHDatastream[] {

@@ -108,6 +108,24 @@ const addFeatureMarker = (item) => {
   }
 }
 
+const addAllSamplingFeaturePMs = () => {
+  console.log('Add All Sampling Feature PMs button clicked')
+  systems.forEach((system) => {
+    system.samplingFeatures.forEach((feature) => {
+      const geom = new Geometry(feature.properties.id, feature.properties.geometry.type, feature.properties.geometry.coordinates, feature.properties, feature.properties.bbox)
+      let newViz = new OSHVisualization('featuremarker-' + randomUUID(),
+        feature.properties.name || feature.properties.id,
+        'pointmarker-feature',
+        null,
+        undefined
+      );
+      newViz.geometry = geom
+
+      visualizationStore.addVisualization(newViz);
+    })
+  })
+}
+
 const getItemChildren = computed(() => {
   return (item) => {
     return item?.getDSChildren ? item.getDSChildren() : []
@@ -127,8 +145,7 @@ const getItemChildren = computed(() => {
     </v-tab>
   </v-tabs>
   <v-btn @click="fetchResources">Fetch Resources</v-btn>
-  <!--  <v-btn @click="getSystems">Get Systems</v-btn>
-    <v-btn @click="getAllDatastreams">Get DataStreams</v-btn>-->
+  <v-btn @click="addAllSamplingFeaturePMs">All PMS</v-btn>
 
   <v-tabs-window v-model="activeTab">
     <v-tabs-window-item value="systems">

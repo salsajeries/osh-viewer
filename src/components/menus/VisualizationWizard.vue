@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useUIStore } from '@/stores/uistore'
 import ChartOptions from '@/components/menus/ChartOptions.vue'
 import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
-import { CreateChartView, CreateChartViewProps, CreateVideoViewProps } from '@/lib/DatasourceUtils'
 import { VisualizationComponents } from '@/lib/VisualizationHelpers'
 import { useVisualizationStore } from '@/stores/visualizationstore'
 import { storeToRefs } from 'pinia'
 import VideoOptions from '@/components/menus/VideoOptions.vue'
+import { CreateChartViewProps, CreateVideoViewProps } from '@/lib/DatasourceUtils'
 
 const uiStore = useUIStore();
 const { selectedDatastream } = storeToRefs(uiStore);
@@ -78,7 +78,7 @@ function createVisualization() {
   let visualizationComponents: VisualizationComponents | undefined = undefined;
   switch (newViz.type) {
     case 'chart':
-      const chartResult = CreateChartViewProps(selectedDatastream.value, selectedDSProperty.value);
+      const chartResult = CreateChartViewProps(selectedDatastream.value, selectedDSProperty.value, vizStore.currentVisDataStreamOptions)
       visualizationComponents = {
         dataSource: chartResult.dataSource,
         dataLayer: chartResult.chartLayer,
@@ -88,7 +88,7 @@ function createVisualization() {
     case 'video':
       // Add video-specific properties if needed
       const videoResult = CreateVideoViewProps(selectedDatastream.value, selectedDSProperty.value,
-        selectedVisualizationOptions.value);
+        selectedVisualizationOptions.value, vizStore.currentVisDataStreamOptions);
       visualizationComponents = {
         dataSource: videoResult.dataSource,
         dataLayer: videoResult.videoLayer,

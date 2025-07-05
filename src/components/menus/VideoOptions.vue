@@ -1,36 +1,36 @@
 <script setup lang="ts">
 import { fetchSchema, mineDatasourceObsProps, SchemaFieldProperty } from '@/lib/DatasourceUtils'
-import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
-import { nextTick, onMounted, ref, watch } from 'vue'
-import { randomUUID } from 'osh-js/source/core/utils/Utils'
+import { onMounted, ref, watch } from 'vue'
 import { useVisualizationStore } from '@/stores/visualizationstore'
 import { useUIStore } from '@/stores/uistore'
 import DataSourcePicker from '@/components/menus/DataSourcePicker.vue'
+import TimePicker from '@/components/menus/TimePicker.vue'
+import { useStartEndTimeSync, usePlaybackModeSync } from '@/composables/DataSourceOptions'
+import { Mode } from 'osh-js/source/core/datasource/Mode.js'
 
-const props = defineProps<{
-  // onAddVideo: () => void;
-  // observedProperties: any[];
-  // dsName: string;
-}>()
 
-const isOpen = ref<boolean>(false)
 const visualizationStore = useVisualizationStore()
 const videoDS = ref<any>(null)
-// const selectedProperty = ref<SchemaFieldProperty | null>(null)
 const selectedProperty = defineModel('selectedProperty', {
   type: SchemaFieldProperty,
   default: null
 })
-// const videoType = ref<string>('H264') // Default video type
+
 const videoType = defineModel('videoType', {
   type: String,
   default: 'H264'
 })
 const obsProps = ref<{ 'definition': string, 'label': string }[]>([])
 const dsSchema = ref<any>(null)
-const uiStore = useUIStore()
-
+const startTime = ref<string | null>(null)
+const endTime = ref<string | null>(null)
 const emit = defineEmits(['update:selectedProperty', 'update:videoType'])
+// Time Mode Options
+const playbackMode = ref(Mode.REAL_TIME)
+const playbackModes = Object.entries(Mode).map(([key, value]) => ({
+  label: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+  value
+}))
 
 async function fetchProps() {
   const { ds, observedProps } = mineDatasourceObsProps()
@@ -53,11 +53,27 @@ watch(videoType, (val) => {
   console.log('[VideoOptions] Video type changed:', val)
   emit('update:videoType', val)
 })
+
+// Use the composable to sync start and end time with the visualization store
+useStartEndTimeSync(startTime, endTime, visualizationStore)
+usePlaybackModeSync(playbackMode, visualizationStore)
+
 </script>
 
 <template>
   <v-card>
     <DataSourcePicker title="Video Options" v-model:selectedProperty="selectedProperty" />
+    <TimePicker title="Start Time" v-model:formattedDate="startTime" />
+    <TimePicker title="End Time" v-model:formattedDate="endTime" />
+    <v-combobox
+      v-model="playbackMode"
+      :items="playbackModes"
+      item-title="label"
+      item-value="value"
+      label="Playback Mode"
+      variant="solo"
+      density="compact"
+    />
 
     <v-card class="pa-4" elevation="2">
       <h3>Video Type</h3>

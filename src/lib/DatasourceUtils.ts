@@ -128,7 +128,8 @@ export class SchemaFieldProperty {
   }
 }
 
-export function CreateChartView(ds: OSHDatastream, selectedProperty: any): any {
+// deprecated
+export function CreateChartView(ds: OSHDatastream, selectedProperty: any, visOptions: any): any {
   console.log('[DatasourceUtils] Creating Chart View for Datastream:', OSHDatastream)
   // const ds = OSHDatastream.datastream;
   console.log('[DatasourceUtils] Creating Chart View for Datastream:', ds)
@@ -185,7 +186,14 @@ export function CreateChartView(ds: OSHDatastream, selectedProperty: any): any {
 
   }
 
-export function CreateChartViewProps(ds: OSHDatastream, selectedProperty: any): {
+/**
+ * Creates properties for a Chart View based on the provided datastream, selected property, and visualization options.
+ * @param ds
+ * @param selectedProperty
+ * @param visOptions
+ * @constructor
+ */
+export function CreateChartViewProps(ds: OSHDatastream, selectedProperty: any, visOptions:any): {
   dataSource: ISweApiDataSourceProperties,
   chartLayer: ICurveLayerProperties,
   chartView: IChartViewProperties
@@ -196,9 +204,9 @@ export function CreateChartViewProps(ds: OSHDatastream, selectedProperty: any): 
     resource: `/datastreams/${ds.datastream.properties.id}/observations`,
     tls: false,
     protocol: 'ws',
-    startTime: 'now',
-    endTime: '2025-08-01T00:00:00Z',
-    mode: Mode.REAL_TIME,
+    startTime: visOptions.startTime || 'now',
+    endTime: visOptions.endTime || '2125-08-01T00:00:00Z',
+    mode: visOptions.replayMode.value || Mode.REAL_TIME,
     responseFormat: 'application/swe+json'
   }
 
@@ -237,7 +245,15 @@ export function CreateChartViewProps(ds: OSHDatastream, selectedProperty: any): 
   }
 }
 
-export function CreateVideoViewProps(ds: OSHDatastream, selectedProperty: any, videoFormat: any): {
+/**
+ * Creates properties for a Video View based on the provided datastream, selected property, video format, and visualization options.
+ * @param ds
+ * @param selectedProperty
+ * @param videoFormat
+ * @param visOptions
+ * @constructor
+ */
+export function CreateVideoViewProps(ds: OSHDatastream, selectedProperty: any, videoFormat: any, visOptions: any): {
   dataSource: ISweApiDataSourceProperties
   videoLayer: IVideoLayerProperties,
   videoView: IVideoViewProperties
@@ -249,9 +265,9 @@ export function CreateVideoViewProps(ds: OSHDatastream, selectedProperty: any, v
     resource: `/datastreams/${ds.datastream.properties.id}/observations`,
     tls: false,
     protocol: 'ws',
-    startTime: 'now',
-    endTime: '2025-08-01T00:00:00Z',
-    mode: Mode.REAL_TIME,
+    startTime: visOptions.startTime || 'now',
+    endTime: visOptions.endTime || '2125-08-01T00:00:00Z',
+    mode: visOptions.replayMode.value || Mode.REAL_TIME,
     responseFormat: 'application/swe+binary'
   }
 

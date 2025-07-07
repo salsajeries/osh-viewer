@@ -75,6 +75,21 @@ export interface IVideoViewProperties extends DataViewProperties {
   videoType: string
 }
 
+export interface IMapLayerProperties extends DataLayerProperties {
+  dataSourceId: string;
+  getCoordinates: (rec: any) => { lat: number, lon: number };
+  markerColor?: string;
+  markerIcon?: string;
+  name: string;
+}
+
+export interface IMapViewProperties extends DataViewProperties {
+  container: string;
+  layers: IMapLayerProperties[];
+  css?: string;
+  refreshRate?: number;
+}
+
 export class VisualizationComponents {
   dataLayer: DataLayerProperties
   dataView: DataViewProperties
@@ -181,5 +196,35 @@ export class VideoViewProperties implements DataViewProperties {
     this.width = props.width;
     this.height = props.height;
     this.layers = props.layers.map(layer => new VideoLayerProperties(layer));
+  }
+}
+
+export class MapLayerProperties implements IMapLayerProperties {
+  dataSourceId: string;
+  getCoordinates: (rec: any) => { lat: number, lon: number };
+  markerColor?: string;
+  markerIcon?: string;
+  name: string;
+
+  constructor(props: IMapLayerProperties) {
+    this.dataSourceId = props.dataSourceId;
+    this.getCoordinates = props.getCoordinates;
+    this.markerColor = props.markerColor;
+    this.markerIcon = props.markerIcon;
+    this.name = props.name;
+  }
+}
+
+export class MapViewProperties implements IMapViewProperties {
+  container: string;
+  layers: IMapLayerProperties[];
+  css?: string;
+  refreshRate?: number;
+
+  constructor(props: IMapViewProperties) {
+    this.container = props.container;
+    this.layers = props.layers;
+    this.css = props.css;
+    this.refreshRate = props.refreshRate;
   }
 }

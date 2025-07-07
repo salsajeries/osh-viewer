@@ -8,7 +8,8 @@ import { VisualizationComponents } from '@/lib/VisualizationHelpers'
 import { useVisualizationStore } from '@/stores/visualizationstore'
 import { storeToRefs } from 'pinia'
 import VideoOptions from '@/components/menus/VideoOptions.vue'
-import { CreateChartViewProps, CreateVideoViewProps } from '@/lib/DatasourceUtils'
+import PointMarkerOptions from '@/components/menus/PointMarkerOptions.vue'
+import { CreateChartViewProps, CreateMapViewProps, CreateVideoViewProps } from '@/lib/DatasourceUtils'
 
 const uiStore = useUIStore();
 const { selectedDatastream } = storeToRefs(uiStore);
@@ -18,6 +19,7 @@ const step = ref(0)
 const selectedType = ref('')
 const selectedDSProperty = ref(null)
 const selectedVisualizationOptions = ref(null)
+const selectedMarkerProperty = ref(null)
 
 const visualizationName = ref('')
 const visualizationComponents = ref<VisualizationComponents | undefined>(undefined)
@@ -32,7 +34,7 @@ const steps = [
 const visualizationTypes = [
   { label: 'Chart', value: 'chart', icon: 'mdi-chart-line' },
   { label: 'Video', value: 'video', icon: 'mdi-video' },
-  { label: 'Point Marker', value: 'map', icon: 'mdi-map' },
+  { label: 'Point Marker', value: 'pointmarker', icon: 'mdi-map' },
   { label: 'Text', value: 'text', icon: 'mdi-format-text' }
 ]
 
@@ -95,8 +97,14 @@ function createVisualization() {
         dataView: videoResult.videoView
       }
       break;
-    case 'map':
-      // Add map-specific properties if needed
+    case 'pointmarker':
+      const pmResult = CreateMapViewProps(selectedDatastream.value, selectedMarkerProperty.value,
+        vizStore.currentVisDataStreamOptions)
+      visualizationComponents = {
+        dataSource: pmResult.dataSource,
+        dataLayer: pmResult.mapLayer,
+        dataView: pmResult.mapView
+      }
       break;
     case 'text':
       // Add text-specific properties if needed
@@ -169,8 +177,8 @@ watch(selectedVisualizationOptions, (val) => {
         <VideoOptions v-model:selectedProperty="selectedDSProperty"
                       v-model:videoType="selectedVisualizationOptions" />
       </div>
-      <div v-else-if="selectedType === 'map'">
-        <v-alert type="info">Map marker options coming soon...</v-alert>
+      <div v-else-if="selectedType === 'pointmarker'">
+        <PointMarkerOptions v-model:selectedProperty="selectedMarkerProperty" />
       </div>
       <div v-else-if="selectedType === 'text'">
         <v-alert type="info">Text options coming soon...</v-alert>

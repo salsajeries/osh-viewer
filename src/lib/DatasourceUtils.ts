@@ -10,7 +10,9 @@ import {
   IChartViewProperties,
   ICurveLayerProperties,
   ISweApiDataSourceProperties, IVideoLayerProperties,
-  IVideoViewProperties
+  IVideoViewProperties,
+  IMapLayerProperties,
+  IMapViewProperties
 } from '@/lib/VisualizationHelpers'
 
 
@@ -300,5 +302,62 @@ export function CreateVideoViewProps(ds: OSHDatastream, selectedProperty: any, v
     dataSource,
     videoLayer,
     videoView
+  }
+}
+
+/**
+ * Creates properties for a Map View based on the provided datastream, selected property, and visualization options.
+ * @param ds
+ * @param selectedProperty
+ * @param visOptions
+ * @constructor
+ */
+export function CreateMapViewProps(ds: OSHDatastream, selectedProperty: any, visOptions: any): {
+  dataSource: ISweApiDataSourceProperties,
+  mapLayer: IMapLayerProperties,
+  mapView: IMapViewProperties
+} {
+  // Build SweApiDataSourceProperties
+  const dataSource: ISweApiDataSourceProperties = {
+    endpointUrl: ds.datastream.networkProperties.endpointUrl,
+    resource: `/datastreams/${ds.datastream.properties.id}/observations`,
+    tls: false,
+    protocol: 'ws',
+    startTime: visOptions.startTime || 'now',
+    endTime: visOptions.endTime || '2125-08-01T00:00:00Z',
+    mode: visOptions.replayMode.value || Mode.REAL_TIME,
+    responseFormat: 'application/swe+json'
+  }
+
+  console.log('[DatasourceUtils] Creating PM Layer for property:', selectedProperty)
+  // Build MapLayerProperties
+  const mapLayer: IMapLayerProperties = {
+    dataSourceId: ds.datastream.properties.id,
+    getLocation: (rec: any) => {
+      // Assumes the selectedProperty is an object with lat/lon or similar
+      // You may need to adjust this logic based on your schema
+      return {
+        x: rec[selectedProperty.name].lon,
+        y: rec[selectedProperty.name].lat,
+        z: rec[selectedProperty.name].alt || 0 // Default to 0 if altitude is not provided
+      }
+    },
+    markerColor: visOptions.markerColor || 'red',
+    markerIcon: visOptions.markerIcon || undefined,
+    name: selectedProperty.label || selectedProperty.name || 'Marker'
+  }
+
+  // Build MapViewProperties
+  const mapView: IMapViewProperties = {
+    container: `map-container-${randomUUID()}`,
+    layers: [mapLayer],
+    css: 'map-view',
+    refreshRate: 1000
+  }
+
+  return {
+    dataSource,
+    mapLayer,
+    mapView
   }
 }

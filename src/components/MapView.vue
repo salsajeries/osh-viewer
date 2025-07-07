@@ -8,6 +8,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useVisualizationStore } from '../stores/visualizationstore'
 import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
 import { createLocationDataSource } from '@/components/visualizations/DataComposables'
+import SweApi from 'osh-js/source/core/datasource/sweapi/SweApi.datasource.js'
 
 
 let pointMarker = new PointMarkerLayer({
@@ -67,23 +68,32 @@ onMounted(() => {
     currentVisualizations.value.push(...newFiltered)
 
     for (const viz of newFiltered) {
-      const datasource = createLocationDataSource(viz.parentDatastream)
+      // const datasource = createLocationDataSource(viz.parentDatastream)
 
+      let dsInstance = new SweApi('pm-datasource', {
+        endpointUrl: viz.visualizationComponents.dataSource.endpointUrl,
+        resource: viz.visualizationComponents.dataSource.resource,
+        tls: viz.visualizationComponents.dataSource.tls,
+        protocol: viz.visualizationComponents.dataSource.protocol,
+        startTime: viz.visualizationComponents.dataSource.startTime,
+        endTime: viz.visualizationComponents.dataSource.endTime,
+        mode: viz.visualizationComponents.dataSource.mode,
+        responseFormat: viz.visualizationComponents.dataSource.responseFormat
+      });
+      console.log('[MapView] Creating datasource for PointMarkerLayer:', dsInstance)
+
+      const layerOpts = viz.visualizationComponents.dataLayer
       const pmLayer = new PointMarkerLayer({
         name: viz.name,
-        dataSourceIds: [datasource.id],
-        getLocation: (rec: any) => {
-          console.log(`getLocation called for record: ${rec}`)
-          return {
-            x: rec.location.lon,
-            y: rec.location.lat,
-            z: rec.location.alt
-          }
-        }
+        dataSourceIds: [dsInstance.id],
+        getLocation: layerOpts.getLocation
       })
       pmLayers.value.push(pmLayer)
       leafletMapView.addLayer(pmLayer)
-      datasource.connect()
+
+      console.log('[MapView] Creating PointMarkerLayer:', pmLayer)
+
+      dsInstance.connect()
     }
   }, { deep: true })
 

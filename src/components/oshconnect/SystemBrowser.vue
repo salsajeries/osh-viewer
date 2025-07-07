@@ -56,20 +56,20 @@ const addVisualization = (item) => {
   console.log('Add Visualization button clicked for item:', item);
   setSelectedDatastream(item)
 
-  const { ds, observedProps } = mineDatasourceObsProps()
+ /* const { ds, observedProps } = mineDatasourceObsProps()
 
-  console.log('Observed Props:', observedProps)
+  console.log('Observed Props:', observedProps)*/
 
-  const propsList = [
+  /*const propsList = [
     'SensorLocation',
     'sensorLocation',
     'location',
     'PlatformLocation',
     'platformLocation',
     'Location'
-  ]
+  ]*/
 
-  if (checkDSForProp('SensorLocation', observedProps)) {
+  /*if (checkDSForProp('SensorLocation', observedProps)) {
     console.log('Location property found, adding visualization')
     const newMapViz = new OSHVisualization('pointmarker-' + randomUUID(),
       item.name,
@@ -79,7 +79,7 @@ const addVisualization = (item) => {
     )
 
     visualizationStore.addVisualization(newMapViz);
-  }
+  }*/
 
   // wizardDialog.value = true
   openVisualizationWizard()
@@ -210,7 +210,6 @@ const getItemChildren = computed(() => {
     </v-tabs-window-item>
   </v-tabs-window>
 
-  <!--  <v-btn @click="visualizationWizardOpen = true" class="mb-2">Add Visualization</v-btn>-->
   <v-dialog v-model="visualizationWizardOpen" max-width="540">
     <VisualizationWizard />
   </v-dialog>

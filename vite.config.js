@@ -5,7 +5,10 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-import { simpleWorkerPlugin, workersFromDir } from 'simple-worker-vite/plugin'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
+
+const cesiumSource = "node_modules/cesium/Build/Cesium";
+const cesiumBaseUrl = "public/cesium";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,6 +16,14 @@ export default defineConfig({
     vue(),
     vueJsx(),
     vueDevTools(),
+    viteStaticCopy({
+      targets: [
+        { src: `${cesiumSource}/ThirdParty`, dest: cesiumBaseUrl },
+        { src: `${cesiumSource}/Workers`, dest: cesiumBaseUrl },
+        { src: `${cesiumSource}/Assets`, dest: cesiumBaseUrl },
+        { src: `${cesiumSource}/Widgets`, dest: cesiumBaseUrl },
+      ]
+    })
   ],
   resolve: {
     alias: {
@@ -37,5 +48,8 @@ export default defineConfig({
     rollupOptions: {
 
     }
+  },
+  define: {
+    CESIUM_BASE_URL: JSON.stringify(cesiumBaseUrl),
   }
 })

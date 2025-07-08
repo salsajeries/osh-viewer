@@ -230,6 +230,11 @@ export class OSHDatastream {
   registerWithSynchronizer(synchronizer: DataSynchronizer): void {
     synchronizer.addDataSource(this.datastream);
   }
+
+  getParentSystem(): OSHSystem {
+    const systemStore = getSharedStores().systemStore;
+    return systemStore.getSystemById(this.parentId);
+  }
 }
 
 export class OSHControlStream {

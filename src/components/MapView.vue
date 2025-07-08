@@ -86,7 +86,9 @@ onMounted(() => {
       const pmLayer = new PointMarkerLayer({
         name: viz.name,
         dataSourceIds: [dsInstance.id],
-        getLocation: layerOpts.getLocation
+        getLocation: layerOpts.getLocation,
+        label: viz.visualizationComponents.dataLayer.name,
+        labelOffset: [-16, -32],
       })
       pmLayers.value.push(pmLayer)
       leafletMapView.addLayer(pmLayer)

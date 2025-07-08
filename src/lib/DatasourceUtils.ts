@@ -317,6 +317,8 @@ export function CreateMapViewProps(ds: OSHDatastream, selectedProperty: any, vis
   mapLayer: IMapLayerProperties,
   mapView: IMapViewProperties
 } {
+  console.log('[DatasourceUtils] Creating Map View for Datastream:', ds)
+  const parentSystem = ds.getParentSystem()
   // Build SweApiDataSourceProperties
   const dataSource: ISweApiDataSourceProperties = {
     endpointUrl: ds.datastream.networkProperties.endpointUrl,
@@ -344,7 +346,7 @@ export function CreateMapViewProps(ds: OSHDatastream, selectedProperty: any, vis
     },
     markerColor: visOptions.markerColor || 'red',
     markerIcon: visOptions.markerIcon || undefined,
-    name: selectedProperty.label || selectedProperty.name || 'Marker'
+    name: parentSystem.name
   }
 
   // Build MapViewProperties

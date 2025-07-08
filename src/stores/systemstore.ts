@@ -27,5 +27,9 @@ export const useSystemStore = defineStore('systems', () => {
     return systems.value.some(system => system.id === id)
   }
 
-  return { systems, addSystem, removeSystem, getSystemByName, checkIfSystemExists  }
+  const getSystemById = (id: string) => {
+    return systems.value.find(system => system.id === id)
+  }
+
+  return { systems, addSystem, removeSystem, getSystemByName, checkIfSystemExists, getSystemById  }
 })

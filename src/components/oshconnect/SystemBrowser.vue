@@ -55,33 +55,6 @@ const addVisualization = (item) => {
   console.log('Item properties:', Object.keys(item));
   console.log('Add Visualization button clicked for item:', item);
   setSelectedDatastream(item)
-
- /* const { ds, observedProps } = mineDatasourceObsProps()
-
-  console.log('Observed Props:', observedProps)*/
-
-  /*const propsList = [
-    'SensorLocation',
-    'sensorLocation',
-    'location',
-    'PlatformLocation',
-    'platformLocation',
-    'Location'
-  ]*/
-
-  /*if (checkDSForProp('SensorLocation', observedProps)) {
-    console.log('Location property found, adding visualization')
-    const newMapViz = new OSHVisualization('pointmarker-' + randomUUID(),
-      item.name,
-      'pointmarker',
-      null,
-      ds
-    )
-
-    visualizationStore.addVisualization(newMapViz);
-  }*/
-
-  // wizardDialog.value = true
   openVisualizationWizard()
 }
 
@@ -96,7 +69,7 @@ const addFeatureMarker = (item) => {
     console.log('SamplingFeature Geometry:', geom)
 
     let newViz = new OSHVisualization('featuremarker-' + randomUUID(),
-      foi.properties.name || foi.properties.id,
+      foi.properties.properties.name,
       'pointmarker-feature',
       null,
       undefined
@@ -112,9 +85,10 @@ const addAllSamplingFeaturePMs = () => {
   console.log('Add All Sampling Feature PMs button clicked')
   systems.forEach((system) => {
     system.samplingFeatures.forEach((feature) => {
+      console.log('[SystemBrowser] Adding feature marker for:', feature);
       const geom = new Geometry(feature.properties.id, feature.properties.geometry.type, feature.properties.geometry.coordinates, feature.properties, feature.properties.bbox)
       let newViz = new OSHVisualization('featuremarker-' + randomUUID(),
-        feature.properties.name || feature.properties.id,
+        `${feature.properties.properties.name}` ,
         'pointmarker-feature',
         null,
         undefined

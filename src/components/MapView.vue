@@ -102,7 +102,7 @@ onMounted(() => {
     const newFiltered = updated.filter(val => !currentVisualizations.value.includes(val))
 
     for (const viz of newFiltered) {
-      const pmLayer = new PointMarkerLayer({
+     /* const pmLayer = new PointMarkerLayer({
         name: viz.name,
         dataSourceIds: [],
         location: {
@@ -114,7 +114,7 @@ onMounted(() => {
 
       console.log('[MapView] Adding feature visualization layer:', pmLayer)
 
-      pmLayers.value.push(pmLayer)
+      pmLayers.value.push(pmLayer)*/
       leafletMapView.addMarker({
         location: {
           x: viz.geometry.coordinates[0],

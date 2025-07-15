@@ -10,6 +10,7 @@ import { storeToRefs } from 'pinia'
 import VideoOptions from '@/components/menus/VideoOptions.vue'
 import PointMarkerOptions from '@/components/menus/PointMarkerOptions.vue'
 import { CreateChartViewProps, CreateMapViewProps, CreateVideoViewProps } from '@/lib/DatasourceUtils'
+import IconPicker from '@/components/menus/IconPicker.vue'
 
 const uiStore = useUIStore();
 const { selectedDatastream } = storeToRefs(uiStore);
@@ -189,7 +190,7 @@ watch(selectedVisualizationOptions, (val) => {
     </div>
     <div v-else-if="step === 2">
       <h2 class="mb-4 text-center">Visualization Customization</h2>
-      <div class="text-grey text-center">(Mockup step)</div>
+      <IconPicker></IconPicker>
     </div>
 
     <v-row class="mt-6" justify="end">

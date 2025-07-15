@@ -9,6 +9,7 @@ import { useVisualizationStore } from '../stores/visualizationstore'
 import { OSHVisualization } from '@/lib/OSHConnectDataStructs'
 import { createLocationDataSource } from '@/components/visualizations/DataComposables'
 import SweApi from 'osh-js/source/core/datasource/sweapi/SweApi.datasource.js'
+import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 
 const visualizationStore = useVisualizationStore()
 const mapLayerType = ref('cesium')
@@ -25,13 +26,6 @@ const featureVisualizations = computed(() => {
 })
 
 
-let pointMarker = new PointMarkerLayer({
-  location: {
-    x: 0,
-    y: 0,
-    z: 0
-  }
-})
 
 // Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ZWYzYjhiMy0wMzcwLTQxMTktOGY1OS0wYzM1NzNlOTI3NDMiLCJpZCI6Mzk4MzMsImlhdCI6MTc0ODIwNDA4OX0.HBox4N50pESMU1yJs33-0cNd22sTvIv0KetnMAJMdXU'
 
@@ -42,7 +36,7 @@ onMounted(() => {
   if (mapLayerType.value === 'leaflet') {
     const leafletMapView = new LeafletView({
       container: 'cesiumContainer',
-      layers: [pointMarker],
+      layers: [],
       autoZoomOnFirstMarker: true
     })
 
@@ -50,31 +44,46 @@ onMounted(() => {
 
   } else {
 
+    /*const customViewer = new Cesium.Viewer('cesiumContainer', {
+      terrain: Cesium.Terrain.fromWorldTerrain(),
+      baseLayer: Cesium.ImageryLayer.fromProviderAsync(
+        Cesium.IonImageryProvider.fromAssetId(3), {}
+      ),
+      timeline: false,
+      homeButton: false,
+      navigationInstructionsInitiallyVisible: false,
+      navigationHelpButton: true,
+      geocoder: true,
+      animation: false,
+      fullscreenButton: false,
+      baseLayerPicker: true
+    })*/
+
+    Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzZDlhZDVkOC0yMWZmLTQyMzYtYTU5Zi0yNTQ3MjAxYzFiM2YiLCJpZCI6Mzk4MzMsImlhdCI6MTc1MTk1MTk0OH0.0eS77LohXhxKTRDy9yhLo-wmYGTn9mz31-f4xer7eT0'
+
     const cesiumView = new CesiumView({
       container: 'cesiumContainer',
-      layers: [
-        pointMarker
-      ]
+      // viewer: customViewer,
     })
-    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzZDlhZDVkOC0yMWZmLTQyMzYtYTU5Zi0yNTQ3MjAxYzFiM2YiLCJpZCI6Mzk4MzMsImlhdCI6MTc1MTk1MTk0OH0.0eS77LohXhxKTRDy9yhLo-wmYGTn9mz31-f4xer7eT0'
-    cesiumView.viewer.terrainProvider = new EllipsoidTerrainProvider()
-
-    let tp = new CesiumTerrainProvider({
-      url: IonResource.fromAssetId(1),
-      accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzZDlhZDVkOC0yMWZmLTQyMzYtYTU5Zi0yNTQ3MjAxYzFiM2YiLCJpZCI6Mzk4MzMsImlhdCI6MTc1MTk1MTk0OH0.0eS77LohXhxKTRDy9yhLo-wmYGTn9mz31-f4xer7eT0',
-      requestVertexNormals: true,
-      requestWaterMask: true
-    })
-
-    // leafletMapView.viewer.terrainProvider = Cesium.CesiumTerrainProvider.fromIonAssetId(
-
-    //   1, {
-    //     requestVertexNormals: true,
-    //     requestWaterMask: true
-    //   })
-    cesiumView.viewer.terrainProvider = tp
-
     mapView.value = cesiumView
+
+    /*mapView.value.addMarker({
+      location: {
+        x: 0,
+        y: 0,
+        z: 0
+      },
+      label: 'TEST',
+      labelOffset: [0, 0],
+      icon: '/icons/map/map-marker.svg',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      id: 'test-marker',
+      markerId: 'test-marker' + '-feature' + randomUUID()
+    })*/
+
+    // TEST: remove this later
+    // addCesiumMarker()
   }
 })
 
@@ -100,7 +109,7 @@ watch(mapVisualizations, (updated) => {
   console.log('New visualizations:', newFiltered)
   for (const viz of newFiltered) {
     currentVisualizations.value.push(viz)
-    let dsInstance = new SweApi('pm-datasource', {
+    let dsInstance = new SweApi('pm-datasource-' + randomUUID(), {
       endpointUrl: viz.visualizationComponents.dataSource.endpointUrl,
       resource: viz.visualizationComponents.dataSource.resource,
       tls: viz.visualizationComponents.dataSource.tls,
@@ -115,8 +124,16 @@ watch(mapVisualizations, (updated) => {
       name: viz.name,
       dataSourceIds: [dsInstance.id],
       getLocation: layerOpts.getLocation,
+      // getLocation: (rec, timestamp) => {
+      //   return {
+      //     x: rec.location.lat,
+      //     y: rec.location.lon,
+      //     z: rec.location.alt || 0
+      //   }
+      // },
       label: viz.visualizationComponents.dataLayer.name,
       icon: '/icons/map/map-marker.svg',
+      iconSize: [32, 32],
       labelOffset: [-16, -32],
     })
     pmLayers.value.push(pmLayer)
@@ -139,30 +156,84 @@ watch(featureVisualizations, (updated) => {
 
   // Add new feature visualizations
   const newFiltered = updated.filter(val => !currentVisualizations.value.includes(val))
-  for (const viz of newFiltered) {
-    currentVisualizations.value.push(viz)
-    mapView.value.addMarker({
-      location: {
-        x: viz.geometry.coordinates[0],
-        y: viz.geometry.coordinates[1],
-        z: viz.geometry.coordinates[2]
-      },
-      label: viz.name,
-      labelOffset: [0, 0],
-      icon: '/icons/map/map-marker.svg',
-      iconSize: [32, 32],
-      iconAnchor: [16, 32]
-    })
+
+  if (mapLayerType.value === 'cesium') {
+    for (const viz of newFiltered) {
+      addCesiumMarker(viz)
+    }
+
+  } else {
+
+    for (const viz of newFiltered) {
+      currentVisualizations.value.push(viz)
+      mapView.value.addMarker({
+        location: {
+          x: viz.geometry.coordinates[0],
+          y: viz.geometry.coordinates[1],
+          z: viz.geometry.coordinates[2] || 0
+        },
+        label: viz.name,
+        labelOffset: [0, 0],
+        icon: '/icons/map/map-marker.svg',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        id: viz.id,
+        markerId: viz.id + '-feature' + randomUUID()
+      })
+    }
   }
 }, { deep: true })
+
+function addCesiumMarker(viz: any) {
+  console.log('[MapView] TEST Adding Cesium marker')
+  const viewer = mapView.value.viewer
+  const location = {
+    x: viz.geometry.coordinates[0],
+    y: viz.geometry.coordinates[1],
+    z: viz.geometry.coordinates[2] || 10
+  }
+
+  /*viewer.entities.add({
+    // position: Cesium.Cartesian3.fromDegrees(-75.59777, 40.03883),
+    position: Cesium.Cartesian3.fromDegrees(location.x, location.y, location.z),
+    billboard: {
+      image: '/icons/map/map-marker.svg'
+    }
+  })*/
+
+  const markerProps = {
+    location: {
+      x: viz.geometry.coordinates[0],
+      y: viz.geometry.coordinates[1],
+      z: viz.geometry.coordinates[2] || 0
+    },
+    label: viz.name,
+    labelOffset: [0, 0],
+    icon: '/icons/map/map-marker.svg',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    id: viz.id,
+    markerId: viz.id + '-feature' + randomUUID()
+  }
+
+  let markerEnt = mapView.value.addMarker(markerProps, undefined)
+
+  mapView.value.addMarkerToLayer(markerEnt,  markerProps);
+}
 
 
 </script>
 
 <template>
-  <div class="cesium-container" id="cesiumContainer"></div>
+  <div class="maphero">
+    <!--    <v-btn @click="addCesiumMarker" position="absolute">Add Cesium Marker</v-btn>-->
+    <div class="cesium-container maphero" id="cesiumContainer"></div>
+  </div>
+
 </template>
 
 <style scoped>
-
+.maphero {
+  height: 100%;
+}
 </style>

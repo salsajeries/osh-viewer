@@ -1,5 +1,16 @@
 # OSHViewer
 
+## Working with the project locally
+install Node.js and npm if you haven't already. You can download them from the [Node.js official website](https://nodejs.org/).
+Install the Node.js dependencies:
+```bash
+npm install
+```
+Run the projet in development mode:
+```bash
+npm run dev
+```
+
 ## Creating a reusable Docker Container
 Build the project bundle:
 ```bash

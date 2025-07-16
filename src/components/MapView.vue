@@ -12,7 +12,7 @@ import SweApi from 'osh-js/source/core/datasource/sweapi/SweApi.datasource.js'
 import { randomUUID } from 'osh-js/source/core/utils/Utils.js'
 
 const visualizationStore = useVisualizationStore()
-const mapLayerType = ref('cesium')
+const mapLayerType = ref('leaflet')
 const mapView = ref<any>(null)
 const currentVisualizations = ref<OSHVisualization[]>([])
 const pmLayers = ref([])

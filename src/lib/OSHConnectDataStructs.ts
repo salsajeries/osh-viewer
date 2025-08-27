@@ -115,7 +115,7 @@ export class OSHNode {
 
   async collectAndStoreSystems(): Promise<OSHSystem[]> {
     // make request
-    const systems: any = new Systems({ endpointUrl: this.getEndpointUrl(), tls: false });
+    const systems: any = new Systems({ endpointUrl: this.getEndpointUrl(), tls: true });
     let retrievedSystems: any[] = [];
     const results: System = await systems.searchSystems(new SystemFilter(), 100);
 

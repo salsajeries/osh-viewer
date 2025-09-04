@@ -139,7 +139,7 @@ export function CreateChartView(ds: OSHDatastream, selectedProperty: any, visOpt
   const dataSource = new SweApi(ds.name, {
     endpointUrl: ds.datastream.networkProperties.endpointUrl,
     resource: `/datastreams/${ds.datastream.properties.id}/observations`,
-    tls: true,
+    tls: false,
     protocol: 'ws',
     startTime: 'now',
     endTime: '2025-08-01T00:00:00Z',
@@ -204,7 +204,7 @@ export function CreateChartViewProps(ds: OSHDatastream, selectedProperty: any, v
   const dataSource: ISweApiDataSourceProperties = {
     endpointUrl: ds.datastream.networkProperties.endpointUrl,
     resource: `/datastreams/${ds.datastream.properties.id}/observations`,
-    tls: true,
+    tls: false,
     protocol: 'ws',
     startTime: visOptions.startTime || 'now',
     endTime: visOptions.endTime || '2125-08-01T00:00:00Z',
@@ -265,7 +265,7 @@ export function CreateVideoViewProps(ds: OSHDatastream, selectedProperty: any, v
   const dataSource: ISweApiDataSourceProperties = {
     endpointUrl: ds.datastream.networkProperties.endpointUrl,
     resource: `/datastreams/${ds.datastream.properties.id}/observations`,
-    tls: true,
+    tls: false,
     protocol: 'ws',
     startTime: visOptions.startTime || 'now',
     endTime: visOptions.endTime || '2125-08-01T00:00:00Z',
@@ -323,7 +323,7 @@ export function CreateMapViewProps(ds: OSHDatastream, selectedProperty: any, vis
   const dataSource: ISweApiDataSourceProperties = {
     endpointUrl: ds.datastream.networkProperties.endpointUrl,
     resource: `/datastreams/${ds.datastream.properties.id}/observations`,
-    tls: true,
+    tls: false,
     protocol: 'ws',
     startTime: visOptions.startTime || 'now',
     endTime: visOptions.endTime || '2125-08-01T00:00:00Z',

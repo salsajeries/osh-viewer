@@ -63,7 +63,7 @@ function oldSetupMethod() {
   const dsConverted = new SweApi(ds.name, {
     endpointUrl: ds.datastream.networkProperties.endpointUrl,
     resource: `/datastreams/${ds.datastream.properties.id}/observations`,
-    tls: true,
+    tls: false,
     protocol: 'ws',
     startTime: 'now',
     endTime: '2025-08-01T00:00:00Z',

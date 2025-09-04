@@ -25,6 +25,7 @@ const createNode = () => {
   console.log('Node User:', nodeUser.value)
 
   oshconnect.createNode(nodeName.value, nodeHost.value, nodePort.value, nodePath.value, nodeUser.value, nodePassword.value, this)
+  cancelForm();
 }
 
 const cancelForm = () => {
